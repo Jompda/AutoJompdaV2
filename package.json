@@ -1,0 +1,17 @@
+{
+    "name": "autojompdav2",
+    "version": "0.0.1",
+    "description": "A multipurpose Discord bot developed by Joni Rapo.",
+    "main": "target/index.js",
+    "author": "Joni Rapo",
+    "scripts": {
+        "buildwin": "rmdir target /s /q & tsc --build",
+        "start": "node ./target/",
+        "testwin": "npm run buildwin && npm run start"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "discord.js": "^13.1.0",
+        "dotenv": "^10.0.0"
+    }
+}
