@@ -1,3 +1,4 @@
+import { Guild, Message } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -11,6 +12,21 @@ function forEachFile(currentPath: string, filter = (filepath: string, filename: 
 }
 
 
+function resolveMember(msg: Message, start = 0) {
+    if (!msg.guild) throw new Error(`Cannot resolve member without a guild.`)
+    const userId = resolveTagId(msg.content, start)
+    return userId ? msg.guild?.members.resolve(userId) : undefined
+}
+
+
+function resolveTagId(text: string, start = 0) {
+    const results = /<(@!|@&|#)(\d{18})>/.exec(start ? text.slice(start) : text)
+    return results && 2 in results ? results[2] : undefined
+}
+
+
 export {
-    forEachFile
+    forEachFile,
+    resolveMember,
+    resolveTagId
 }

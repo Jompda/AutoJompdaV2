@@ -10,7 +10,11 @@ const bot = {
     client: new dcjs.Client({
         intents: [
             dcjs.Intents.FLAGS.GUILDS,
-            dcjs.Intents.FLAGS.GUILD_MESSAGES
+            dcjs.Intents.FLAGS.GUILD_MESSAGES,
+            dcjs.Intents.FLAGS.DIRECT_MESSAGES
+        ],
+        partials: [
+            'CHANNEL'
         ]
     }),
     defaultPrefix: config.defaultPrefix

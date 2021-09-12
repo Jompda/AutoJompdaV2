@@ -5,9 +5,9 @@
     "main": "target/index.js",
     "author": "Joni Rapo",
     "scripts": {
-        "buildwin": "rmdir target /s /q & tsc --build",
-        "start": "node ./target/",
-        "testwin": "npm run buildwin && npm run start"
+        "build": "rmdir target /s /q & tsc --build",
+        "start": "node .",
+        "test": "npm run build && npm run start"
     },
     "license": "ISC",
     "dependencies": {

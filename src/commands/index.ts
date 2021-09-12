@@ -5,6 +5,8 @@ import { forEachFile } from '../util'
 
 
 const commands = new Map<string, Command>()
+const guildCommands = new Map<string, Command>()
+const privateCommands = new Map<string, Command>()
 
 
 forEachFile(
@@ -18,6 +20,8 @@ forEachFile(
 
             const command = jsfile.default
             commands.set(command.commandName, command)
+            if (command.guildCommand) guildCommands.set(command.commandName, command)
+            if (command.privateCommand) privateCommands.set(command.commandName, command)
         } catch (err) {
             console.error(err)
         }
@@ -29,9 +33,9 @@ console.log(commands)
 function interpret(msg: Message) {
     const content = msg.content.slice(bot.defaultPrefix.length)
     const param = content.split(/\s/)
-    const commandName = param.shift()
+    const commandName = param.shift()?.toLowerCase()
     if (!commandName) return msg.reply('Unspecified command.').catch(console.error)
-    const command = commands.get(commandName)
+    const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
     if (!command) return msg.reply(`Unrecognized command "${commandName}".`).catch(console.error)
     command.run(msg)
 }
@@ -39,5 +43,7 @@ function interpret(msg: Message) {
 
 export {
     commands,
+    guildCommands,
+    privateCommands,
     interpret
 }
