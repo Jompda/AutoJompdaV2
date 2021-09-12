@@ -23,10 +23,18 @@ const bot = {
 
 export default bot
 import './commands'
-import './events'
+import { initializeEvents } from './events'
+import { serializeDB } from './databasemanager'
 
 
 console.log('Connecting ..')
+bot.client.on('ready', () => {
+    if (!bot.client.user) return console.log(`Couldn't log in!`)
+    console.log(`Successfully logged in as ${bot.client.user.tag}!`)
+    serializeDB(() => {
+        initializeEvents()
+    })
+})
 bot.client.login(process.env.DISCORD_TOKEN)
 
 
