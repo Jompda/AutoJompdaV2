@@ -24,7 +24,7 @@ const bot = {
 export default bot
 import './commands'
 import { initializeEvents } from './events'
-import { serializeDB } from './databasemanager'
+import { serializeDB, closeDB } from './databasemanager'
 
 
 console.log('Connecting ..')
@@ -39,7 +39,10 @@ bot.client.login(process.env.DISCORD_TOKEN)
 
 
 process.on('SIGINT', () => {
-    console.log('Received SIGINT! Closing client ..')
+    console.log('Received SIGINT! Shutting down ..')
     bot.client.destroy()
+    closeDB((err) => {
+        if (err) console.log(err)
+    })
 })
 
