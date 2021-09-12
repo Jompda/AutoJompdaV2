@@ -1,8 +1,8 @@
+import * as dcjs from 'discord.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
 
-import * as dcjs from 'discord.js'
 import * as config from './config.json'
 
 

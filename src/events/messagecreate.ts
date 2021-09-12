@@ -1,6 +1,6 @@
+import { Message } from 'discord.js'
 import Event from '../structure/event'
 import bot from '..'
-import { Message } from 'discord.js'
 import { interpret } from '../commands'
 import { resolveTagId } from '../util'
 import SafeError from '../structure/safeerror'

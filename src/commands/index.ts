@@ -28,7 +28,6 @@ forEachFile(
         }
     }
 )
-console.log(commands)
 
 
 function interpret(msg: Message) {

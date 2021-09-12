@@ -1,5 +1,6 @@
 import Event from '../structure/event'
 import bot from '..'
+import { serializeDB } from '../databasemanager'
 
 
 class Ready extends Event {
@@ -9,6 +10,7 @@ class Ready extends Event {
     run() {
         if (!bot.client.user) return console.log(`Couldn't log in!`)
         console.log(`Successfully logged in as ${bot.client.user.tag}!`)
+        serializeDB()
     }
 }
 
