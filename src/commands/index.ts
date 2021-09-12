@@ -1,6 +1,7 @@
-import { Message } from 'discord.js'
+import { GuildMember, Message, PermissionFlags } from 'discord.js'
 import bot from '..'
 import Command from '../structure/command'
+import SafeError from '../structure/safeerror'
 import { forEachFile } from '../util'
 
 
@@ -37,7 +38,24 @@ function interpret(msg: Message) {
     if (!commandName) return msg.reply('Unspecified command.').catch(console.error)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
     if (!command) return msg.reply(`Unrecognized command "${commandName}".`).catch(console.error)
+
+    // Unnecessary ifs but the code won't compile without them. TODO: FIX
+    if (msg.member) checkPermissions(msg.member, command.memberPermissions)
+    if (msg.guild && bot.client.user) checkPermissions(msg.guild.members.resolve(bot.client.user.id), command.botPermissions)
     command.run(msg)
+}
+
+
+function checkPermissions(member: GuildMember | null, permissions: Array<bigint>) {
+    if (!member) throw new Error('Member undefined')
+    let pass = true, errMsg = `Member can't run this command due to not having the following permissions:`
+    for (let permission of permissions)
+        if (!member.permissions.has(permission)) {
+            pass = false
+            errMsg += '\n' + permission // TODO: Resolve bigint to a human-readable permission name.
+        }
+    if (!pass) throw new SafeError(errMsg)
+    return true
 }
 
 

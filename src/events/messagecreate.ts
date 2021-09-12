@@ -3,6 +3,7 @@ import bot from '..'
 import { Message } from 'discord.js'
 import { interpret } from '../commands'
 import { resolveTagId } from '../util'
+import SafeError from '../structure/safeerror'
 
 
 class MessageCreate extends Event {
@@ -12,7 +13,13 @@ class MessageCreate extends Event {
     run(msg: Message) {
         if (msg.author === bot.client.user) return;
         console.log(`${msg.author.tag}@${msg.guild?.name}:${msg.channel.toString()}: ${msg.content}`)
-        if (msg.content.startsWith(bot.defaultPrefix /*TODO: Custom prefix for guilds.*/)) return interpret(msg)
+        if (msg.content.startsWith(bot.defaultPrefix /*TODO: Custom prefix for guilds.*/))
+            try {
+                interpret(msg)
+            } catch (err) {
+                if (err instanceof SafeError) msg.reply(err.message)
+                else throw err
+            }
 
         const hiMsg = `Hi there! My command prefix is **${bot.defaultPrefix}**\n` +
             `Type **${bot.defaultPrefix}help** for more information.`

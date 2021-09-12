@@ -1,4 +1,4 @@
-import { Message } from 'discord.js'
+import { Message, Permissions } from 'discord.js'
 import Command from '../../structure/command'
 
 
@@ -9,7 +9,8 @@ class Ping extends Command {
             usage: 'ping',
             description: 'Measures the delay between the end-user and the Bot.',
             guildCommand: true,
-            privateCommand: true
+            privateCommand: true,
+            memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]
         })
     }
     run(msg: Message) {
