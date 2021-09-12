@@ -9,8 +9,7 @@ class Ping extends Command {
             usage: 'ping',
             description: 'Measures the delay between the end-user and the Bot.',
             guildCommand: true,
-            privateCommand: true,
-            memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]
+            privateCommand: true
         })
     }
     run(msg: Message) {

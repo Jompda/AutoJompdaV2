@@ -26,5 +26,5 @@ export default abstract class Command {
         this.memberPermissions = options.memberPermissions || []
         this.botPermissions = options.botPermissions || []
     }
-    abstract run(msg: Message): any
+    abstract run(msg: Message, param: Array<string>): any
 }

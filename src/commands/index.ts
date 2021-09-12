@@ -37,12 +37,12 @@ function interpret(msg: Message) {
     const commandName = param.shift()?.toLowerCase()
     if (!commandName) return msg.reply('Unspecified command.').catch(console.error)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
-    if (!command) return msg.reply(`Unrecognized command "${commandName}".`).catch(console.error)
+    if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
 
     // Unnecessary ifs but the code won't compile without them. TODO: FIX
     if (msg.member) checkPermissions(msg.member, command.memberPermissions)
     if (msg.guild && bot.client.user) checkPermissions(msg.guild.members.resolve(bot.client.user.id), command.botPermissions)
-    command.run(msg)
+    command.run(msg, param)
 }
 
 
