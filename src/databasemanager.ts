@@ -53,12 +53,10 @@ function synchronizeGuilds() {
                             dbGuild.prefix = row.prefix
                             continue
                         }
-                        db.prepare(`INSERT INTO guild VALUES (?, ?)`)
-                            .run([
-                                guildId,
-                                dbGuild.prefix = bot.defaultPrefix
-                            ])
-                            .finalize()
+                        db.run('INSERT INTO guild VALUES (?, ?)', [
+                            guildId,
+                            dbGuild.prefix = bot.defaultPrefix
+                        ])
                         console.log(`Added guild ${guild.name}(${guild.id}) to the database.`)
                     }
                     // Lazy af
