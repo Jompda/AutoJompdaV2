@@ -18,8 +18,8 @@ class MessageCreate extends Event {
             `Hi there! My command prefix is **${bot.defaultPrefix}**\n` +
             `Type **${bot.defaultPrefix}}help** for more information.`
         )
-        const guild = dbManager.cache.guilds.get(msg.guild.id)
-        if (msg.content.startsWith(guild?.prefix ?? bot.defaultPrefix))
+        const dbGuild = dbManager.cache.getGuild(msg.guild.id)
+        if (msg.content.startsWith(dbGuild.prefix))
             try {
                 interpret(msg)
             } catch (err) {
@@ -28,8 +28,8 @@ class MessageCreate extends Event {
             }
         const mentionedUserId = resolveTagId(msg.content)
         if (mentionedUserId === bot.client.user?.id) msg.reply(
-            `Hi there! My command prefix is **${guild?.prefix}**\n` +
-            `Type **${guild?.prefix}help** for more information.`
+            `Hi there! My command prefix is **${dbGuild.prefix}**\n` +
+            `Type **${dbGuild.prefix}help** for more information.`
         )
     }
 }

@@ -6,13 +6,19 @@ import bot from '.'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
-interface DBGuild extends Guild {
+interface DBGuild {
+    guildId: string
     prefix: string
 }
 
 
 const cache = {
-    guilds: new Map<string, DBGuild>()
+    guilds: new Map<string, DBGuild>(),
+    getGuild: (guildId: string) => {
+        const guild = cache.guilds.get(guildId)
+        if (!guild) throw new Error(`Guild(${guildId}) doesn't exist in the database`)
+        return guild
+    }
 }
 
 
@@ -46,7 +52,10 @@ function synchronizeGuilds() {
             bot.client.guilds.fetch()
                 .then(guilds => {
                     for (const [guildId, guild] of guilds) {
-                        const dbGuild = guild as unknown as DBGuild
+                        const dbGuild = {
+                            guildId: guildId,
+                            prefix: bot.defaultPrefix
+                        }
                         cache.guilds.set(guildId, dbGuild)
                         const row = rows.find(row => row.guildId === guildId)
                         if (row) {
@@ -55,9 +64,9 @@ function synchronizeGuilds() {
                         }
                         db.run('INSERT INTO guild VALUES (?, ?)', [
                             guildId,
-                            dbGuild.prefix = bot.defaultPrefix
+                            dbGuild.prefix
                         ])
-                        console.log(`Added guild ${guild.name}(${guild.id}) to the database.`)
+                        console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
                     }
                     // Lazy af
                     console.log('Synchronization finished.')
