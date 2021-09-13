@@ -14,7 +14,7 @@ class Ping extends Command {
     }
     run(msg: Message) {
         const receiveTime = Date.now()
-        let userToBot = msg.createdTimestamp - receiveTime, botToGateway
+        let userToBot = msg.createdTimestamp - receiveTime, botToGateway // ???????????
         msg.reply('Pinging ..')
             .then(replyMsg => replyMsg.edit(
                 `User -> Bot :: **${userToBot}ms**\n` +

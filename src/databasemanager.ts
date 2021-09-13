@@ -1,3 +1,4 @@
+import { Guild } from 'discord.js'
 import * as sqlite from 'sqlite3'
 import bot from '.'
 
@@ -5,9 +6,13 @@ import bot from '.'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
-interface DBGuild {
-    guildId: string
+interface DBGuild extends Guild {
     prefix: string
+}
+
+
+const cache = {
+    guilds: new Map<string, DBGuild>()
 }
 
 
@@ -41,9 +46,18 @@ function synchronizeGuilds() {
             bot.client.guilds.fetch()
                 .then(guilds => {
                     for (const [guildId, guild] of guilds) {
-                        if (rows.find(row => row.guildId === guildId)) continue
+                        const dbGuild = guild as unknown as DBGuild
+                        cache.guilds.set(guildId, dbGuild)
+                        const row = rows.find(row => row.guildId === guildId)
+                        if (row) {
+                            dbGuild.prefix = row.prefix
+                            continue
+                        }
                         db.prepare(`INSERT INTO guild VALUES (?, ?)`)
-                            .run([guildId, bot.defaultPrefix])
+                            .run([
+                                guildId,
+                                dbGuild.prefix = bot.defaultPrefix
+                            ])
                             .finalize()
                         console.log(`Added guild ${guild.name}(${guild.id}) to the database.`)
                     }
@@ -57,20 +71,10 @@ function synchronizeGuilds() {
 }
 
 
-function getGuild(guildId: string) {
-    return new Promise<DBGuild>((resolve, reject) => {
-        db.get(`SELECT guildId, prefix FROM guild WHERE guildId=${guildId} LIMIT 1`, (err, row) => {
-            if (err) return reject(err)
-            resolve(row)
-        })
-    })
-}
-
-
 export {
     DBGuild,
     serialize,
     close,
-    getGuild
+    cache
 }
 

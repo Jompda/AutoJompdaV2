@@ -21,10 +21,10 @@ export default abstract class Command {
         this.commandName = options.commandName
         this.usage = options.usage
         this.description = options.description
-        this.guildCommand = options.guildCommand || false
-        this.privateCommand = options.privateCommand || false
-        this.memberPermissions = options.memberPermissions || []
-        this.botPermissions = options.botPermissions || []
+        this.guildCommand = options.guildCommand ?? false
+        this.privateCommand = options.privateCommand ?? false
+        this.memberPermissions = options.memberPermissions ?? []
+        this.botPermissions = options.botPermissions ?? []
     }
     abstract run(msg: Message, param: Array<string>): any
 }
