@@ -11,37 +11,48 @@ interface DBGuild {
 }
 
 
-function serializeDB(cb: (err: Error | null) => any) {
-    db.serialize(() => {
-        db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT)')
-        synchronizeGuilds(cb)
+function serialize() {
+    return new Promise<void>((resolve, reject) => {
+        db.serialize(() => {
+            db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT)')
+            synchronizeGuilds()
+                .then(resolve)
+                .catch(reject)
+        })
     })
 }
 
 
-function closeDB(cb: (err: Error | null) => any) {
-    db.close(cb)
+function close() {
+    return new Promise<void>((resolve, reject) => {
+        db.close((err) => {
+            if (err) return reject(err)
+            resolve()
+        })
+    })
 }
 
 
-function synchronizeGuilds(cb: (err: Error | null) => any) {
-    console.log('Synchronizing guilds with the database ..')
-    db.all('SELECT guildId, prefix FROM guild', (err, rows) => {
-        if (err) cb(err)
-        bot.client.guilds.fetch()
-            .then(guilds => {
-                for (const [guildId, guild] of guilds) {
-                    if (rows.find(row => row.guildId === guildId)) continue
-                    db.prepare(`INSERT INTO guild VALUES (?, ?)`)
-                        .run([guildId, bot.defaultPrefix])
-                        .finalize()
-                    console.log(`Added guild ${guild.name}(${guild.id}) to the database.`)
-                }
-                // Lazy af
-                console.log('Synchronization finished.')
-                cb(null)
-            })
-            .catch(cb)
+function synchronizeGuilds() {
+    return new Promise<void>((resolve, reject) => {
+        console.log('Synchronizing guilds with the database ..')
+        db.all('SELECT guildId, prefix FROM guild', (err, rows) => {
+            if (err) return reject(err)
+            bot.client.guilds.fetch()
+                .then(guilds => {
+                    for (const [guildId, guild] of guilds) {
+                        if (rows.find(row => row.guildId === guildId)) continue
+                        db.prepare(`INSERT INTO guild VALUES (?, ?)`)
+                            .run([guildId, bot.defaultPrefix])
+                            .finalize()
+                        console.log(`Added guild ${guild.name}(${guild.id}) to the database.`)
+                    }
+                    // Lazy af
+                    console.log('Synchronization finished.')
+                    resolve()
+                })
+                .catch(reject)
+        })
     })
 }
 
@@ -58,8 +69,8 @@ function getGuild(guildId: string) {
 
 export {
     DBGuild,
-    serializeDB,
-    closeDB,
+    serialize,
+    close,
     getGuild
 }
 

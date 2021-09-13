@@ -13,7 +13,7 @@ class MessageCreate extends Event {
     }
     run(msg: Message) {
         if (msg.author === bot.client.user) return;
-        console.log(`${msg.author.tag}@${msg.guild?.name}:${msg.channel}: ${msg.content}`)
+        //console.log(`${msg.author.tag}@${msg.guild?.name}:${msg.channel}: ${msg.content}`)
         if (!msg.guild) return msg.reply(
             `Hi there! My command prefix is **${bot.defaultPrefix}**\n` +
             `Type **${bot.defaultPrefix}}help** for more information.`
