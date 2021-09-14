@@ -3,6 +3,7 @@ import bot from '..'
 import Command from '../structure/command'
 import SafeError from '../structure/safeerror'
 import { forEachFile, stringifyPermission } from '../util'
+import * as db from '../databasemanager'
 
 
 const commands = new Map<string, Command>()
@@ -31,7 +32,7 @@ forEachFile(
 
 
 function interpret(msg: Message) {
-    const content = msg.content.slice(bot.defaultPrefix.length)
+    const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
     const param = content.split(/\s/)
     const commandName = param.shift()?.toLowerCase()
     if (!commandName) return msg.reply('Unspecified command.').catch(console.error)
