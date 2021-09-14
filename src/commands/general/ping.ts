@@ -1,5 +1,5 @@
 import { Message } from 'discord.js'
-import Command from '../../structure/command'
+import { Command } from '../../structure/command'
 
 
 class Ping extends Command {

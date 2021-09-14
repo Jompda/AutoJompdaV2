@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js'
 import { commands, guildCommands, privateCommands } from '..'
 import bot from '../..'
-import Command from '../../structure/command'
+import { Command } from '../../structure/command'
 
 
 const commandsPerPage = 10
@@ -11,15 +11,15 @@ class Help extends Command {
     constructor() {
         super({
             commandName: 'help',
-            usage: 'help [page|command]',
+            parameters: [{ parameterName: 'page|command', optional: true }],
             description: 'Displays a help menu.',
             contexts: ['guild', 'private']
         })
     }
-    run(msg: Message, param: Array<string>) {
-        const page = parseInt(0 in param ? param[0] : '1')
+    run(msg: Message, parsedParameters: Map<string, string>) {
+        const page = parseInt(parsedParameters.get('page|command') ?? '1')
         return isNaN(page)
-            ? Help.printCommandUsage(msg, param[0])
+            ? Help.printCommandUsage(msg, parsedParameters.get('page|command') as string)
             : Help.printHelpMenu(msg, page)
     }
     static printHelpMenu(msg: Message, page: number) {

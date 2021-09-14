@@ -1,6 +1,6 @@
-import { GuildMember, Message, PermissionFlags, User } from 'discord.js'
+import { GuildMember, Message, User } from 'discord.js'
 import bot from '..'
-import Command from '../structure/command'
+import { Command, CommandParameter } from '../structure/command'
 import SafeError from '../structure/safeerror'
 import { forEachFile, stringifyPermission } from '../util'
 import * as db from '../databasemanager'
@@ -33,8 +33,8 @@ forEachFile(
 
 function interpret(msg: Message) {
     const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
-    const param = content.split(/\s/)
-    const commandName = param.shift()?.toLowerCase()
+    const rawParam = content.split(/\s/)
+    const commandName = rawParam.shift()?.toLowerCase()
     if (!commandName) return msg.reply(`Yup.. That's the prefix..`).catch(console.error)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
     if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
@@ -44,12 +44,27 @@ function interpret(msg: Message) {
         checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
     }
 
-    if (command.param) {
-        for (const parameter of command.param) {
-
+    const parsedParameters = new Map<string, string>()
+    const parsedSwitches = new Map<string, string>()
+    if (command.parameters || command.switches) {
+        let parameterIndex = 0
+        for (let i = 0; i < rawParam.length; i++) {
+            if (!rawParam[i].startsWith('-')) {
+                parsedParameters.set(
+                    (command.parameters as Array<CommandParameter>)[parameterIndex++].parameterName,
+                    rawParam[i]
+                )
+            } else {
+                parsedSwitches.set(
+                    rawParam[i++].slice(1),
+                    rawParam[i]
+                )
+            }
         }
     }
-    command.run(msg, param)
+    if (parsedParameters.size < command.requiredParameters) throw new SafeError(`Not enough parameters!`)
+
+    command.run(msg, parsedParameters, parsedSwitches)
 }
 
 
