@@ -30,7 +30,7 @@ import * as db from './databasemanager'
 
 
 console.log('Connecting to Discord API ..')
-bot.client.on('ready', () => {
+bot.client.once('ready', () => {
     if (!bot.client.user) return console.log(`Couldn't log in!`)
     console.log(`Successfully logged in as ${bot.client.user.tag}!`)
     db.serialize()

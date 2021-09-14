@@ -9,7 +9,7 @@ import * as dbManager from '../databasemanager'
 
 class MessageCreate extends Event {
     constructor() {
-        super({ eventName: 'messageCreate', runOnce: false })
+        super({ eventName: 'messageCreate' })
     }
     run(msg: Message) {
         if (msg.author === bot.client.user) return
