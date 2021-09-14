@@ -17,9 +17,10 @@ class Help extends Command {
         })
     }
     run(msg: Message, parsedParameters: Map<string, string>) {
-        const page = parseInt(parsedParameters.get('page|command') ?? '1')
+        const parsedParameter = parsedParameters.get('page|command') as string
+        const page = parseInt(parsedParameter ?? '1')
         return isNaN(page)
-            ? Help.printCommandUsage(msg, parsedParameters.get('page|command') as string)
+            ? Help.printCommandUsage(msg, parsedParameter)
             : Help.printHelpMenu(msg, page)
     }
     static printHelpMenu(msg: Message, page: number) {

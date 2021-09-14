@@ -16,8 +16,9 @@ class SetPrefix extends Command {
     run(msg: Message, parsedParameters: Map<string, string>) {
         // TODO: Parameter error automatisation
         const dbGuild = db.cache.getGuild(msg.guildId as string)
-        if (parsedParameters.get('prefix') === dbGuild.prefix) return msg.reply(`That's the old one m8!`)
-        dbGuild.prefix = parsedParameters.get('prefix') as string
+        const parsedPrefix = parsedParameters.get('prefix') as string
+        if (parsedPrefix === dbGuild.prefix) return msg.reply(`That's the old one m8!`)
+        dbGuild.prefix = parsedPrefix
         dbGuild.update()
             .then(() => msg.reply(`Successfully updated the command prefix for the server!`))
             .catch((err) => {
