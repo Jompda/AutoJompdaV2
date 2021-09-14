@@ -6,9 +6,23 @@ import bot from '.'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
-interface DBGuild {
+class DBGuild {
     guildId: string
     prefix: string
+    constructor(obj: any) {
+        this.guildId = obj.guildId
+        this.prefix = obj.prefix
+    }
+    update() {
+        return new Promise<void>((resolve, reject) => {
+            db.run(`UPDATE guild SET prefix = ? WHERE guildId = '${this.guildId}'`,
+                [this.prefix],
+                err => {
+                    if (err) return reject(err)
+                    resolve()
+                })
+        })
+    }
 }
 
 
@@ -52,10 +66,10 @@ function synchronizeGuilds() {
             bot.client.guilds.fetch()
                 .then(guilds => {
                     for (const [guildId, guild] of guilds) {
-                        const dbGuild = {
+                        const dbGuild = new DBGuild({
                             guildId: guildId,
                             prefix: bot.defaultPrefix
-                        }
+                        })
                         cache.guilds.set(guildId, dbGuild)
                         const row = rows.find(row => row.guildId === guildId)
                         if (row) {

@@ -19,10 +19,10 @@ class Help extends Command {
     run(msg: Message, param: Array<string>) {
         const page = parseInt(0 in param ? param[0] : '1')
         return isNaN(page)
-            ? this.printCommandUsage(msg, param[0])
-            : this.printHelpMenu(msg, page)
+            ? Help.printCommandUsage(msg, param[0])
+            : Help.printHelpMenu(msg, page)
     }
-    printHelpMenu(msg: Message, page: number) {
+    static printHelpMenu(msg: Message, page: number) {
         const commandMap = msg.guild ? guildCommands : privateCommands
         const pages = Math.floor(commands.size / commandsPerPage) + (commands.size % commandsPerPage > 0 ? 1 : 0)
         if (page < 1 || page > pages) return msg.reply('Page index out of bounds.')
@@ -37,7 +37,7 @@ class Help extends Command {
 
         msg.reply({ embeds: [embed] })
     }
-    printCommandUsage(msg: Message, commandName: string) {
+    static printCommandUsage(msg: Message, commandName: string) {
         const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
         if (!command) return msg.reply(`Unrecognized command name **${commandName}**.`)
         msg.reply({

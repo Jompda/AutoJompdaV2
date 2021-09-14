@@ -1,4 +1,4 @@
-import { Guild, Message } from 'discord.js'
+import { Guild, Message, Permissions } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -25,8 +25,15 @@ function resolveTagId(text: string, start = 0) {
 }
 
 
+function stringifyPermission(value: bigint) {
+    return Object.getOwnPropertyNames(Permissions.FLAGS)
+        .find(flag => (Permissions.FLAGS as any)[flag] === value)
+}
+
+
 export {
     forEachFile,
     resolveMember,
-    resolveTagId
+    resolveTagId,
+    stringifyPermission
 }

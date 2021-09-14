@@ -2,7 +2,7 @@ import { GuildMember, Message, PermissionFlags, User } from 'discord.js'
 import bot from '..'
 import Command from '../structure/command'
 import SafeError from '../structure/safeerror'
-import { forEachFile } from '../util'
+import { forEachFile, stringifyPermission } from '../util'
 
 
 const commands = new Map<string, Command>()
@@ -52,7 +52,7 @@ function checkPermissions(member: GuildMember | null, permissions: Array<bigint>
     for (let permission of permissions)
         if (!member.permissions.has(permission)) {
             pass = false
-            errMsg += '\n' + permission // TODO: Resolve bigint to a human-readable permission name.
+            errMsg += '\n' + stringifyPermission(permission)
         }
     if (!pass) throw new SafeError(errMsg)
     return true
