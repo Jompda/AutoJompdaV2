@@ -1,4 +1,4 @@
-import { Message } from 'discord.js'
+import { Message, User } from 'discord.js'
 import Event from '../structure/event'
 import bot from '..'
 import { interpret } from '../commands'
@@ -12,24 +12,17 @@ class MessageCreate extends Event {
         super({ eventName: 'messageCreate', runOnce: false })
     }
     run(msg: Message) {
-        if (msg.author === bot.client.user) return;
-        //console.log(`${msg.author.tag}@${msg.guild?.name}:${msg.channel}: ${msg.content}`)
-        if (!msg.guild) return msg.reply(
-            `Hi there! My command prefix is **${bot.defaultPrefix}**\n` +
-            `Type **${bot.defaultPrefix}}help** for more information.`
-        )
-        const dbGuild = dbManager.cache.getGuild(msg.guild.id)
-        if (msg.content.startsWith(dbGuild.prefix))
-            try {
-                interpret(msg)
-            } catch (err) {
+        if (msg.author === bot.client.user) return
+        const prefix = msg.guild ? dbManager.cache.getGuild(msg.guild.id).prefix : bot.defaultPrefix
+        if (msg.content.startsWith(prefix))
+            try { return interpret(msg) }
+            catch (err) {
                 if (err instanceof SafeError) msg.reply(err.message)
                 else throw err
             }
-        const mentionedUserId = resolveTagId(msg.content)
-        if (mentionedUserId === bot.client.user?.id) msg.reply(
-            `Hi there! My command prefix is **${dbGuild.prefix}**\n` +
-            `Type **${dbGuild.prefix}help** for more information.`
+        if (!(msg.guild) || resolveTagId(msg.content) === (bot.client.user as User).id) msg.reply(
+            `Hi there! My command prefix is **${prefix}**\n` +
+            `Type **${prefix}help** for more information.`
         )
     }
 }

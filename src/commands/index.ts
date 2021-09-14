@@ -1,4 +1,4 @@
-import { GuildMember, Message, PermissionFlags } from 'discord.js'
+import { GuildMember, Message, PermissionFlags, User } from 'discord.js'
 import bot from '..'
 import Command from '../structure/command'
 import SafeError from '../structure/safeerror'
@@ -21,8 +21,8 @@ forEachFile(
 
             const command = jsfile.default
             commands.set(command.commandName, command)
-            if (command.guildCommand) guildCommands.set(command.commandName, command)
-            if (command.privateCommand) privateCommands.set(command.commandName, command)
+            if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
+            if (command.hasContext('private')) privateCommands.set(command.commandName, command)
         } catch (err) {
             console.error(err)
         }
@@ -38,9 +38,10 @@ function interpret(msg: Message) {
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
     if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
 
-    // Unnecessary ifs but the code won't compile without them. TODO: FIX
-    if (msg.member) checkPermissions(msg.member, command.memberPermissions)
-    if (msg.guild && bot.client.user) checkPermissions(msg.guild.members.resolve(bot.client.user.id), command.botPermissions)
+    if (msg.guild) {
+        checkPermissions(msg.member, command.memberPermissions)
+        checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
+    }
     command.run(msg, param)
 }
 

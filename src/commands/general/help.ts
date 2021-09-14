@@ -13,8 +13,7 @@ class Help extends Command {
             commandName: 'help',
             usage: 'help [page|command]',
             description: 'Displays a help menu.',
-            guildCommand: true,
-            privateCommand: true
+            contexts: ['guild', 'private']
         })
     }
     run(msg: Message, param: Array<string>) {

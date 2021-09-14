@@ -8,8 +8,7 @@ class Ping extends Command {
             commandName: 'ping',
             usage: 'ping',
             description: 'Measures the delay between the end-user and the Bot.',
-            guildCommand: true,
-            privateCommand: true
+            contexts: ['guild']
         })
     }
     run(msg: Message) {

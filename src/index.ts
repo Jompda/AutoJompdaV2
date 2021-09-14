@@ -18,7 +18,8 @@ const bot = {
         ]
     }),
     defaultPrefix: config.defaultPrefix,
-    close
+    close,
+    exiting: false
 }
 
 
@@ -43,12 +44,14 @@ bot.client.login(process.env.DISCORD_TOKEN)
 
 
 process.on('SIGINT', () => {
-    console.log('Received SIGINT! Shutting down ..')
+    console.log(!bot.exiting ? 'Received SIGINT! Shutting down ..' : 'SIGINT already received. Shutting down ..')
     close()
 })
 
 
 function close() {
+    if (bot.exiting) return
+    bot.exiting = true
     bot.client.destroy()
     db.close().catch((err) => console.error(err))
 }
