@@ -1,14 +1,14 @@
 import { Message, Permissions } from 'discord.js'
-import Command from '../../structure/command'
-import * as db from '../../databasemanager'
-import SafeError from '../../structure/safeerror'
+import Command from '../../../structure/command'
+import * as db from '../../../databasemanager'
+import SafeError from '../../../structure/safeerror'
 
 
 class SetPrefix extends Command {
     constructor() {
         super({
             commandName: 'setprefix',
-            usage: 'setprefix <prefix>',
+            param: [{ paramName: 'prefix' }],
             description: 'Sets the command prefix used on the server.',
             contexts: ['guild'],
             memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]

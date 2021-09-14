@@ -20,7 +20,7 @@ forEachFile(
             if (!('default' in jsfile) || !(jsfile.default instanceof Command))
                 throw new Error(`Non-Command script file "${filepath}" under commands folder!`)
 
-            const command = jsfile.default
+            const command = jsfile.default as Command
             commands.set(command.commandName, command)
             if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
             if (command.hasContext('private')) privateCommands.set(command.commandName, command)
@@ -35,13 +35,19 @@ function interpret(msg: Message) {
     const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
     const param = content.split(/\s/)
     const commandName = param.shift()?.toLowerCase()
-    if (!commandName) return msg.reply('Unspecified command.').catch(console.error)
+    if (!commandName) return msg.reply(`Yup.. That's the prefix..`).catch(console.error)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
     if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
 
     if (msg.guild) {
         checkPermissions(msg.member, command.memberPermissions)
         checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
+    }
+
+    if (command.param) {
+        for (const parameter of command.param) {
+
+        }
     }
     command.run(msg, param)
 }
