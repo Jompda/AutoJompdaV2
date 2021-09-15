@@ -27,7 +27,7 @@ function resolveTagId(text: string, start = 0) {
 
 function stringifyPermission(value: bigint) {
     return Object.getOwnPropertyNames(Permissions.FLAGS)
-        .find(flag => (Permissions.FLAGS as any)[flag] === value)
+        .find(flag => (Permissions.FLAGS as any)[flag] === value) as string
 }
 
 

@@ -17,7 +17,7 @@ class MessageCreate extends Event {
         if (msg.content.startsWith(prefix))
             try { return interpret(msg) }
             catch (err) {
-                if (err instanceof UserError) msg.reply(err.message)
+                if (err instanceof UserError) msg.reply(err.toMessage())
                 else throw err
             }
         if (!(msg.guild) || resolveTagId(msg.content) === (bot.client.user as User).id) msg.reply(

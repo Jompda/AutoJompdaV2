@@ -1,4 +1,4 @@
-import { GuildMember, Message, User } from 'discord.js'
+import { GuildMember, Message, MessageEmbed, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
 import UserError from '../structure/usererror'
@@ -40,8 +40,16 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
     if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
 
     if (msg.guild) {
-        checkPermissions(msg.member, command.memberPermissions)
-        checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
+        const missingMemberPermissions = checkPermissions(msg.member, command.memberPermissions)
+        const missingBotPermissions = checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
+        const embed = new MessageEmbed().setTitle(`Cannot run this command due to:`).setColor('#ff0000')
+        if (missingBotPermissions) {
+            embed.addField(`Bot not having the following permissions:`, missingBotPermissions.join(`\n`))
+        }
+        if (missingMemberPermissions) {
+            embed.addField(`Member not having the following permissions:`, missingMemberPermissions.join(`\n`))
+        }
+        if (embed.fields.length) throw new UserError(embed)
     }
 
     const parsedParameters = new Array<string>()
@@ -69,14 +77,11 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
 
 function checkPermissions(member: GuildMember | null, permissions: Array<bigint>) {
     if (!member) throw new Error('Member undefined')
-    let pass = true, errMsg = `Member can't run this command due to not having the following permissions:`
+    const missingPermissions = new Array<string>()
     for (let permission of permissions)
-        if (!member.permissions.has(permission)) {
-            pass = false
-            errMsg += '\n' + stringifyPermission(permission)
-        }
-    if (!pass) throw new UserError(errMsg)
-    return true
+        if (!member.permissions.has(permission))
+            missingPermissions.push(stringifyPermission(permission))
+    return missingPermissions.length ? missingPermissions : null
 }
 
 
