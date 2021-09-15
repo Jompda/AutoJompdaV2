@@ -15,7 +15,7 @@ function forEachFile(currentPath: string, filter = (filepath: string, filename: 
 function resolveMember(msg: Message, start = 0) {
     if (!msg.guild) throw new Error(`Cannot resolve member without a guild.`)
     const userId = resolveTagId(msg.content, start)
-    return userId ? msg.guild?.members.resolve(userId) : undefined
+    return userId ? msg.guild.members.resolve(userId) : undefined
 }
 
 
