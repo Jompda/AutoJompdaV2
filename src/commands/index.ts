@@ -44,16 +44,14 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
         checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
     }
 
-    const parsedParameters = new Map<string, string>()
+    const parsedParameters = new Array<string>()
     const parsedSwitches = new Map<string, string>()
     if (command.parameters || command.switches) {
         let parameterIndex = 0
         for (let i = 0; i < rawParam.length; i++) {
             if (!rawParam[i].startsWith('-')) {
-                parsedParameters.set(
-                    (command.parameters as Array<CommandParameter>)[parameterIndex++].parameterName,
-                    rawParam[i]
-                )
+                parameterIndex++
+                parsedParameters.push(rawParam[i])
             } else {
                 parsedSwitches.set(
                     rawParam[i++].slice(1),
@@ -62,7 +60,7 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
             }
         }
     }
-    if (parsedParameters.size < command.requiredParameters) throw new SafeError(`Not enough parameters!`)
+    if (parsedParameters.length < command.requiredParameters) throw new SafeError(`Not enough parameters!`)
 
     command.run(msg, parsedParameters, parsedSwitches)
 }

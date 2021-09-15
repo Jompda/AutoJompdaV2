@@ -13,10 +13,9 @@ class SetPrefix extends Command {
             memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]
         })
     }
-    run(msg: Message, parsedParameters: Map<string, string>) {
-        // TODO: Parameter error automatisation
+    run(msg: Message, parsedParameters: Array<string>) {
         const dbGuild = db.cache.getGuild(msg.guildId as string)
-        const parsedPrefix = parsedParameters.get('prefix') as string
+        const parsedPrefix = parsedParameters[0] as string
         if (parsedPrefix === dbGuild.prefix) return msg.reply(`That's the old one m8!`)
         dbGuild.prefix = parsedPrefix
         dbGuild.update()

@@ -44,9 +44,14 @@ abstract class Command {
         this.commandName = options.commandName
         this.parameters = options.parameters
         this.requiredParameters = 0
+        let lastWasOptional = false
         if (options.parameters)
-            for (const temp of options.parameters)
-                if (!temp.optional) this.requiredParameters++
+            for (let i = 0; i < options.parameters.length; i++)
+                if (options.parameters[i].optional) lastWasOptional = true
+                else {
+                    if (lastWasOptional) throw new Error(`Required parameters cannot come after optional parameters!`)
+                    this.requiredParameters++
+                }
         this.switches = options.switches
         this.usage = options.usage ?? constructUsage(options)
         this.description = options.description
@@ -57,12 +62,12 @@ abstract class Command {
     hasContext(context: context) {
         return this.contexts.find(temp => temp === context)
     }
-    abstract run(msg: Message, parsedParameters: Map<string, string>, parsedSwitches: Map<string, string>): any
+    abstract run(msg: Message, parsedParameters: Array<string>, parsedSwitches: Map<string, string>): any
 }
 
 
 function constructUsage(options: CommandOptions) {
-    if (!options.parameters) throw new Error(`Parameters not defined`)
+    if (!options.parameters) throw new Error(`Parameters must be defined if usage is not present in the options!`)
     let result = options.commandName
     let parameterSwitches = new Array<string>()
     for (const temp of options.parameters) {
