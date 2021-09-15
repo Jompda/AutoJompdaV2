@@ -40,16 +40,18 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
     if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
 
     if (msg.guild) {
-        const missingMemberPermissions = checkPermissions(msg.member, command.memberPermissions)
         const missingBotPermissions = checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
-        const embed = new MessageEmbed().setTitle(`Cannot run this command due to:`).setColor('#ff0000')
-        if (missingBotPermissions) {
-            embed.addField(`Bot not having the following permissions:`, missingBotPermissions.join(`\n`))
+        const missingMemberPermissions = checkPermissions(msg.member, command.memberPermissions)
+        if (missingBotPermissions || missingMemberPermissions) {
+            const embed = new MessageEmbed().setTitle(`Cannot run this command due to:`).setColor('#ff0000')
+            if (missingBotPermissions) {
+                embed.addField(`Bot not having the following permissions:`, missingBotPermissions.join(`\n`))
+            }
+            if (missingMemberPermissions) {
+                embed.addField(`Member not having the following permissions:`, missingMemberPermissions.join(`\n`))
+            }
+            throw new UserError(embed)
         }
-        if (missingMemberPermissions) {
-            embed.addField(`Member not having the following permissions:`, missingMemberPermissions.join(`\n`))
-        }
-        if (embed.fields.length) throw new UserError(embed)
     }
 
     const parsedParameters = new Array<string>()
