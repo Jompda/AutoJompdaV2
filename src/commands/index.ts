@@ -1,7 +1,7 @@
 import { GuildMember, Message, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
-import SafeError from '../structure/safeerror'
+import UserError from '../structure/usererror'
 import { forEachFile, stringifyPermission } from '../util'
 import * as db from '../databasemanager'
 
@@ -61,7 +61,7 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
             }
         }
     }
-    if (parsedParameters.length < command.requiredParameters) throw new SafeError(`Not enough parameters!`)
+    if (parsedParameters.length < command.requiredParameters) throw new UserError(`Not enough parameters!`)
 
     command.run(msg, parsedParameters, parsedSwitches)
 }
@@ -75,7 +75,7 @@ function checkPermissions(member: GuildMember | null, permissions: Array<bigint>
             pass = false
             errMsg += '\n' + stringifyPermission(permission)
         }
-    if (!pass) throw new SafeError(errMsg)
+    if (!pass) throw new UserError(errMsg)
     return true
 }
 
