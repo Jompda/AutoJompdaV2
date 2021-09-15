@@ -18,7 +18,7 @@ const bot = {
         ]
     }),
     defaultPrefix: config.defaultPrefix,
-    close,
+    exit,
     exiting: false
 }
 
@@ -37,7 +37,7 @@ bot.client.once('ready', () => {
         .then(initializeEvents)
         .catch((err) => {
             console.error(`Fatal database error: ${err.message}\n${err.stack || ''}`)
-            close()
+            exit()
         })
 })
 bot.client.login(process.env.DISCORD_TOKEN)
@@ -45,11 +45,11 @@ bot.client.login(process.env.DISCORD_TOKEN)
 
 process.on('SIGINT', () => {
     console.log(!bot.exiting ? 'Received SIGINT! Shutting down ..' : 'SIGINT already received. Shutting down ..')
-    close()
+    exit()
 })
 
 
-function close() {
+function exit() {
     if (bot.exiting) return
     bot.exiting = true
     bot.client.destroy()
