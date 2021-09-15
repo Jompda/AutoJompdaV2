@@ -31,9 +31,9 @@ forEachFile(
 )
 
 
-function interpret(msg: Message) { // TODO: Quotation marks "" can be used to mark a single value over spaces.
+function interpret(msg: Message) {
     const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
-    const rawParam = content.split(/\s/)
+    const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
     const commandName = rawParam.shift()?.toLowerCase()
     if (!commandName) return msg.reply(`Yup.. That's the prefix..`).catch(console.error)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
