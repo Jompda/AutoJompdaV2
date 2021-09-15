@@ -11,13 +11,14 @@ class EchoParsed extends Command {
                 { switchName: 'a', description: '1st testswitch' },
                 { switchName: 'b', description: '2nd testswitch', expectedValue: 'any' }
             ],
-            contexts: ['guild', 'private']
+            contexts: ['guild', 'private'],
+            debug: true
         })
     }
     run(msg: Message, parameters: Array<string>, switches: Map<string, string>) {
         const switchObj = {} as any
         switches.forEach((value, key) => switchObj[key] = value)
-        msg.reply('```json\n' + JSON.stringify({ parameters, switchObj }, undefined, 2) + '```')
+        msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```')
     }
 }
 

@@ -21,6 +21,7 @@ forEachFile(
                 throw new Error(`Non-Command script file "${filepath}" under commands folder!`)
 
             const command = jsfile.default as Command
+            if (command.debug && !bot.debugMode) return
             commands.set(command.commandName, command)
             if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
             if (command.hasContext('private')) privateCommands.set(command.commandName, command)
@@ -35,9 +36,10 @@ function interpret(msg: Message) {
     const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
     const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
     const commandName = rawParam.shift()?.toLowerCase()
-    if (!commandName) return msg.reply(`Yup.. That's the prefix..`).catch(console.error)
+    if (!commandName) throw new UserError(`Yup.. That's the prefix..`)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
-    if (!command) return msg.reply(`Unrecognized command **${commandName}**`).catch(console.error)
+    if (!command) throw new UserError(`Unrecognized command **${commandName}**`)
+    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID) throw new UserError(`This command is only available to developers.`)
 
     if (msg.guild) {
         const missingBotPermissions = checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)

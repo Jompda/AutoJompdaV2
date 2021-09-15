@@ -26,7 +26,8 @@ interface CommandOptions {
     description: string,
     contexts: Array<Context>
     memberPermissions?: Array<bigint>,
-    botPermissions?: Array<bigint>
+    botPermissions?: Array<bigint>,
+    debug?: boolean
 }
 
 
@@ -40,6 +41,7 @@ abstract class Command {
     contexts: Array<Context>
     memberPermissions: Array<bigint>
     botPermissions: Array<bigint>
+    debug: boolean
     constructor(options: CommandOptions) {
         this.commandName = options.commandName
         this.parameters = options.parameters
@@ -58,6 +60,7 @@ abstract class Command {
         this.contexts = options.contexts
         this.memberPermissions = options.memberPermissions ?? []
         this.botPermissions = options.botPermissions ?? []
+        this.debug = options.debug ?? false
     }
     hasContext(context: Context) {
         return this.contexts.find(temp => temp === context)
@@ -75,7 +78,7 @@ function constructUsage(options: CommandOptions) {
     if (options.switches) for (const temp of options.switches) {
         parameterSwitches.push(`-${temp.switchName}${temp.expectedValue ? ` <${temp.expectedValue}>` : ''}${temp.description ? ' ' + temp.description : ''}`)
     }
-    return result + (parameterSwitches.length > 0 ? '\nSwitches:\n' + parameterSwitches.join('\n') : '')
+    return result + (parameterSwitches.length > 0 ? '\n*Switches:*\n' + parameterSwitches.join('\n') : '')
 }
 
 

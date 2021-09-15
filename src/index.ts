@@ -19,7 +19,8 @@ const bot = {
     }),
     defaultPrefix: config.defaultPrefix,
     exit,
-    exiting: false
+    exiting: false,
+    debugMode: true
 }
 
 
