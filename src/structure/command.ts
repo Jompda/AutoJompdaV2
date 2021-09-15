@@ -53,7 +53,7 @@ abstract class Command {
                     this.requiredParameters++
                 }
         this.switches = options.switches
-        this.usage = options.usage ?? constructUsage(options)
+        this.usage = constructUsage(options)
         this.description = options.description
         this.contexts = options.contexts
         this.memberPermissions = options.memberPermissions ?? []
@@ -62,15 +62,14 @@ abstract class Command {
     hasContext(context: context) {
         return this.contexts.find(temp => temp === context)
     }
-    abstract run(msg: Message, parsedParameters: Array<string>, parsedSwitches: Map<string, string>): any
+    abstract run(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
 }
 
 
 function constructUsage(options: CommandOptions) {
-    if (!options.parameters) throw new Error(`Parameters must be defined if usage is not present in the options!`)
     let result = options.commandName
     let parameterSwitches = new Array<string>()
-    for (const temp of options.parameters) {
+    if (options.parameters) for (const temp of options.parameters) {
         result += ` ${temp.optional ? '[' : '<'}${temp.parameterName}${temp.optional ? ']' : '>'}${temp.value ? ': ' + temp.value : ''}`
     }
     if (options.switches) for (const temp of options.switches) {

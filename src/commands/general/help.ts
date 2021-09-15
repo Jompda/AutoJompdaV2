@@ -16,8 +16,8 @@ class Help extends Command {
             contexts: ['guild', 'private']
         })
     }
-    run(msg: Message, parsedParameters: Array<string>) {
-        const parsedParameter = parsedParameters[0] as string
+    run(msg: Message, parameters: Array<string>) {
+        const parsedParameter = parameters[0] as string
         const page = parseInt(parsedParameter ?? '1')
         return isNaN(page)
             ? Help.printCommandUsage(msg, parsedParameter)

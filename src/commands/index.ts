@@ -45,7 +45,7 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
     }
 
     const parsedParameters = new Array<string>()
-    const parsedSwitches = new Map<string, string>()
+    const parsedSwitches = new Map<string, string | null>()
     if (command.parameters || command.switches) {
         let parameterIndex = 0
         for (let i = 0; i < rawParam.length; i++) {
@@ -53,10 +53,11 @@ function interpret(msg: Message) { // TODO: Quotation marks "" can be used to ma
                 parameterIndex++
                 parsedParameters.push(rawParam[i])
             } else {
-                parsedSwitches.set(
-                    rawParam[i++].slice(1),
-                    rawParam[i]
-                )
+                if (!command.switches) return msg.reply(`Command doesn't have any switches so why did you define one?`)
+                const switchName = rawParam[i].slice(1)
+                const match = command.switches.find(temp => temp.switchName === switchName)
+                if (!match) return msg.reply(`Unknown switch **${switchName}**`)
+                parsedSwitches.set(switchName, match.expectedValue ? rawParam[++i] : null)
             }
         }
     }

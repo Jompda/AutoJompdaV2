@@ -6,7 +6,6 @@ class Ping extends Command {
     constructor() {
         super({
             commandName: 'ping',
-            usage: 'ping',
             description: 'Measures the delay between the end-user and the Bot.',
             contexts: ['guild', 'private']
         })
