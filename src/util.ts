@@ -1,4 +1,4 @@
-import { Guild, Message, Permissions } from 'discord.js'
+import { Message, Permissions } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 

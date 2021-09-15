@@ -1,4 +1,3 @@
-import { Guild } from 'discord.js'
 import * as sqlite from 'sqlite3'
 import bot from '.'
 

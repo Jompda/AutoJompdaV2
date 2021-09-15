@@ -1,6 +1,6 @@
 import { GuildMember, Message, User } from 'discord.js'
 import bot from '..'
-import { Command, CommandParameter } from '../structure/command'
+import { Command } from '../structure/command'
 import SafeError from '../structure/safeerror'
 import { forEachFile, stringifyPermission } from '../util'
 import * as db from '../databasemanager'
