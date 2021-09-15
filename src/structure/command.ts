@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 
 
-type context = 'guild' | 'private'
+type Context = 'guild' | 'private'
 
 
 interface CommandParameter {
@@ -24,7 +24,7 @@ interface CommandOptions {
     switches?: Array<CommandSwitch>
     usage?: string,
     description: string,
-    contexts: Array<context>
+    contexts: Array<Context>
     memberPermissions?: Array<bigint>,
     botPermissions?: Array<bigint>
 }
@@ -37,7 +37,7 @@ abstract class Command {
     switches?: Array<CommandSwitch>
     usage: string
     description: string
-    contexts: Array<context>
+    contexts: Array<Context>
     memberPermissions: Array<bigint>
     botPermissions: Array<bigint>
     constructor(options: CommandOptions) {
@@ -59,7 +59,7 @@ abstract class Command {
         this.memberPermissions = options.memberPermissions ?? []
         this.botPermissions = options.botPermissions ?? []
     }
-    hasContext(context: context) {
+    hasContext(context: Context) {
         return this.contexts.find(temp => temp === context)
     }
     abstract run(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
