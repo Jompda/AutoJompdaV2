@@ -1,4 +1,4 @@
-import { Interaction, Message } from 'discord.js'
+import { CommandInteraction, Message } from 'discord.js'
 
 
 const optionTypes = new Map<string, number>([
@@ -97,7 +97,7 @@ abstract class Command {
         return command
     }
     abstract onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
-    abstract onInteraction(interaction: Interaction): any
+    abstract onInteraction(interaction: CommandInteraction): any
 }
 
 
