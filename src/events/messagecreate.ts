@@ -4,7 +4,7 @@ import bot from '..'
 import { interpret } from '../commands'
 import { resolveTagId } from '../util'
 import UserError from '../structure/usererror'
-import * as dbManager from '../database'
+import * as db from '../database'
 
 
 class MessageCreate extends Event {
@@ -13,7 +13,7 @@ class MessageCreate extends Event {
     }
     run(msg: Message) {
         if (msg.author === bot.client.user) return
-        const prefix = msg.guild ? dbManager.cache.getGuild(msg.guild.id).prefix : bot.defaultPrefix
+        const prefix = msg.guild ? db.cache.getGuild(msg.guild.id).prefix : bot.defaultPrefix
         if (msg.content.startsWith(prefix))
             try { return interpret(msg) }
             catch (err) {
