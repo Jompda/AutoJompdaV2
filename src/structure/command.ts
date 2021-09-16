@@ -1,4 +1,5 @@
-import { Message } from "discord.js"
+import { Message } from 'discord.js'
+import { SlashCommandBuilder, SlashCommandStringOption } from '@discordjs/builders'
 
 
 type Context = 'guild' | 'private'
@@ -6,8 +7,8 @@ type Context = 'guild' | 'private'
 
 interface CommandParameter {
     parameterName: string
-    value?: string
-    optional?: boolean
+    value: string
+    required: boolean
 }
 
 
@@ -49,7 +50,7 @@ abstract class Command {
         let lastWasOptional = false
         if (options.parameters)
             for (let i = 0; i < options.parameters.length; i++)
-                if (options.parameters[i].optional) lastWasOptional = true
+                if (!options.parameters[i].required) lastWasOptional = true
                 else {
                     if (lastWasOptional) throw new Error(`Required parameters cannot come after optional parameters!`)
                     this.requiredParameters++
@@ -65,6 +66,19 @@ abstract class Command {
     hasContext(context: Context) {
         return this.contexts.find(temp => temp === context)
     }
+    toSlashCommand() {
+        const builder = new SlashCommandBuilder()
+            .setName(this.commandName)
+            .setDescription(this.description)
+        if (this.parameters) for (const parameter of this.parameters)
+            builder.addStringOption(
+                new SlashCommandStringOption()
+                    .setName(parameter.parameterName)
+                    .setDescription(parameter.value)
+                    .setRequired(parameter.required)
+            )
+        return builder.toJSON()
+    }
     abstract run(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
 }
 
@@ -73,7 +87,7 @@ function constructUsage(options: CommandOptions) {
     let result = options.commandName
     let parameterSwitches = new Array<string>()
     if (options.parameters) for (const temp of options.parameters) {
-        result += ` ${temp.optional ? '[' : '<'}${temp.parameterName}${temp.optional ? ']' : '>'}${temp.value ? ': ' + temp.value : ''}`
+        result += ` ${!temp.required ? '[' : '<'}${temp.parameterName}${temp.required ? ']' : '>'}${temp.value ? ': ' + temp.value : ''}`
     }
     if (options.switches) for (const temp of options.switches) {
         parameterSwitches.push(`-${temp.switchName}${temp.expectedValue ? ` <${temp.expectedValue}>` : ''}${temp.description ? ' ' + temp.description : ''}`)

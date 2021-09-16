@@ -7,7 +7,7 @@ class SetPrefix extends Command {
     constructor() {
         super({
             commandName: 'setprefix',
-            parameters: [{ parameterName: 'prefix' }],
+            parameters: [{ parameterName: 'prefix', value: 'string', required: true }],
             description: 'Sets the command prefix used on the server.',
             contexts: ['guild'],
             memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]

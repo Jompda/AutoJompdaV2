@@ -1,6 +1,11 @@
-import { Client, Intents } from 'discord.js'
+import { Client, Intents, User } from 'discord.js'
+import { REST } from '@discordjs/rest'
+import { Routes } from 'discord-api-types/v9'
+import { SlashCommandBuilder, SlashCommandStringOption } from '@discordjs/builders'
 import dotenv from 'dotenv'
 dotenv.config()
+
+
 
 
 const bot = {
@@ -14,6 +19,7 @@ const bot = {
             'CHANNEL'
         ]
     }),
+    rest: new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN as string),
     exit,
     exiting: false,
     debugMode: true
@@ -21,21 +27,35 @@ const bot = {
 
 
 export default bot
-import './commands'
+import { initializeCommands, commands } from './commands'
 import { initializeEvents } from './events'
 import * as db from './database'
+
+
+initializeCommands()
+const slashCommands = new Array<object>()
+for (const [commandName, command] of commands)
+    slashCommands.push(command.toSlashCommand())
+
 
 
 console.log('Connecting to Discord API ..')
 bot.client.once('ready', () => {
     if (!bot.client.user) return console.log(`Couldn't log in!`)
     console.log(`Successfully logged in as ${bot.client.user.tag}!`)
-    db.serialize()
-        .then(initializeEvents)
-        .catch((err) => {
-            console.error(`Fatal database error: ${err.message}\n${err.stack || ''}`)
-            exit()
-        })
+    bot.client.guilds.fetch().then(guilds => {
+        for (const [guildId] of guilds)
+            bot.rest.put(
+                Routes.applicationGuildCommands((bot.client.user as User).id, guildId),
+                { body: slashCommands }
+            )
+        db.serialize()
+            .then(initializeEvents)
+            .catch((err) => {
+                console.error(`Fatal database error: ${err.message}\n${err.stack || ''}`)
+                exit()
+            })
+    }).catch(console.error)
 })
 bot.client.login(process.env.DISCORD_TOKEN)
 

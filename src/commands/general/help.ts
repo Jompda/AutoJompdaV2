@@ -11,7 +11,7 @@ class Help extends Command {
     constructor() {
         super({
             commandName: 'help',
-            parameters: [{ parameterName: 'page|command', optional: true }],
+            parameters: [{ parameterName: 'page_or_command', value: 'string', required: false }],
             description: 'Displays a help menu.',
             contexts: ['guild', 'private']
         })

@@ -11,25 +11,27 @@ const guildCommands = new Map<string, Command>()
 const privateCommands = new Map<string, Command>()
 
 
-forEachFile(
-    __dirname,
-    (filepath, filename) => filename.endsWith('.js') && filename !== 'index.js',
-    filepath => {
-        try {
-            const jsfile = require(filepath)
-            if (!('default' in jsfile) || !(jsfile.default instanceof Command))
-                throw new Error(`Non-Command script file "${filepath}" under commands folder!`)
+function initializeCommands() {
+    forEachFile(
+        __dirname,
+        (filepath, filename) => filename.endsWith('.js') && filename !== 'index.js',
+        filepath => {
+            try {
+                const jsfile = require(filepath)
+                if (!('default' in jsfile) || !(jsfile.default instanceof Command))
+                    throw new Error(`Non-Command script file "${filepath}" under commands folder!`)
 
-            const command = jsfile.default as Command
-            if (command.debug && !bot.debugMode) return
-            commands.set(command.commandName, command)
-            if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
-            if (command.hasContext('private')) privateCommands.set(command.commandName, command)
-        } catch (err) {
-            console.error(err)
+                const command = jsfile.default as Command
+                if (command.debug && !bot.debugMode) return
+                commands.set(command.commandName, command)
+                if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
+                if (command.hasContext('private')) privateCommands.set(command.commandName, command)
+            } catch (err) {
+                console.error(err)
+            }
         }
-    }
-)
+    )
+}
 
 
 function interpret(msg: Message) {
@@ -93,5 +95,6 @@ export {
     commands,
     guildCommands,
     privateCommands,
+    initializeCommands,
     interpret
 }
