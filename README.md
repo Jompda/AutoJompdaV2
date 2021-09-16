@@ -10,6 +10,7 @@ DEVELOPER_DISCORD_CLIENT_ID || Snowflake ID | Only used when `debugMode` is set 
 
 
 ## TODO
+- [ ] Switch to slash commands
 - [ ] Persistent logging
 - [ ] Support for a dedicated database
 - [ ] Somewhat error resistant so the bot doesn't go offline on uncaughtException
