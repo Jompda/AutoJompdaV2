@@ -27,16 +27,12 @@ const bot = {
 
 
 export default bot
-import { initializeCommands, commands } from './commands'
+import { initializeCommands, commands, guildCommands, privateCommands } from './commands'
 import { initializeEvents } from './events'
 import * as db from './database'
 
 
 initializeCommands()
-const slashCommands = new Array<object>()
-for (const [commandName, command] of commands)
-    slashCommands.push(command.toSlashCommand())
-
 
 
 console.log('Connecting to Discord API ..')
@@ -44,10 +40,21 @@ bot.client.once('ready', () => {
     if (!bot.client.user) return console.log(`Couldn't log in!`)
     console.log(`Successfully logged in as ${bot.client.user.tag}!`)
     bot.client.guilds.fetch().then(guilds => {
+        const guildSlashCommands = new Array<object>()
+        for (const [commandName, command] of guildCommands)
+            guildSlashCommands.push(command.toSlashCommand())
+        const privateSlashCommands = new Array<object>()
+        for (const [commandName, command] of privateCommands)
+            privateSlashCommands.push(command.toSlashCommand())
+
+        bot.rest.put(
+            Routes.applicationCommands((bot.client.user as User).id),
+            { body: privateSlashCommands }
+        )
         for (const [guildId] of guilds)
             bot.rest.put(
                 Routes.applicationGuildCommands((bot.client.user as User).id, guildId),
-                { body: slashCommands }
+                { body: guildSlashCommands }
             )
         db.serialize()
             .then(initializeEvents)
