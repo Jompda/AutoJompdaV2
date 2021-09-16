@@ -13,10 +13,9 @@ class InteractionCreate extends Event {
         if (!interaction.isCommand()) return
         if (interaction.user.id === (bot.client.user as User).id) return
         const command = (interaction.guild ? guildCommands : privateCommands).get(interaction.commandName)
-        if (!command) interaction.reply(`Unknown slash command! (idk how)`)
+        if (!command) return interaction.reply(`Unknown slash command! (idk how)`)
         try {
-            console.log(interaction)
-            interaction.reply(`Interactions are not yet implemented!`)
+            command.onInteraction(interaction)
         }
         catch (err) {
             if (err instanceof UserError)

@@ -71,13 +71,13 @@ function interpret(msg: Message) {
                 const switchName = rawParam[i].slice(1)
                 const match = command.switches.find(temp => temp.switchName === switchName)
                 if (!match) return msg.reply(`Unknown switch **${switchName}**`)
-                parsedSwitches.set(switchName, match.expectedValue ? rawParam[++i] : null)
+                parsedSwitches.set(switchName, match.expectedValueType ? rawParam[++i] : null)
             }
         }
     }
     if (parsedParameters.length < command.requiredParameters) throw new UserError(`Not enough parameters!`)
 
-    command.run(msg, parsedParameters, parsedSwitches)
+    command.onMessage(msg, parsedParameters, parsedSwitches)
 }
 
 

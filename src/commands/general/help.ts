@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js'
+import { CommandInteraction, Interaction, Message, MessageEmbed } from 'discord.js'
 import { commands, guildCommands, privateCommands } from '..'
 import { Command } from '../../structure/command'
 import * as db from '../../database'
@@ -11,22 +11,33 @@ class Help extends Command {
     constructor() {
         super({
             commandName: 'help',
-            parameters: [{ parameterName: 'page_or_command', value: 'string', required: false }],
+            parameters: [{
+                parameterName: 'option',
+                description: 'Page number or name of a command.',
+                valueType: 'string'
+            }],
             description: 'Displays a help menu.',
             contexts: ['guild', 'private']
         })
     }
-    run(msg: Message, parameters: Array<string>) {
+    onMessage(msg: Message, parameters: Array<string>) {
         const parsedParameter = parameters[0] as string
         const page = parseInt(parsedParameter ?? '1')
-        return isNaN(page)
-            ? Help.printCommandUsage(msg, parsedParameter)
-            : Help.printHelpMenu(msg, page)
+        msg.reply(isNaN(page)
+            ? Help.constructCommandUsage(Boolean(msg.guild), parsedParameter)
+            : Help.constructHelpMenu(Boolean(msg.guild), page))
     }
-    static printHelpMenu(msg: Message, page: number) {
-        const commandMap = msg.guild ? guildCommands : privateCommands
+    onInteraction(interaction: CommandInteraction) {
+        const parsedParameter = interaction.options.get('option')?.value as string ?? ''
+        const page = parseInt(parsedParameter || '1')
+        interaction.reply(isNaN(page)
+            ? Help.constructCommandUsage(Boolean(interaction.guild), parsedParameter)
+            : Help.constructHelpMenu(Boolean(interaction.guild), page))
+    }
+    static constructHelpMenu(isGuild: boolean, page: number) {
+        const commandMap = isGuild ? guildCommands : privateCommands
         const pages = Math.floor(commands.size / commandsPerPage) + (commands.size % commandsPerPage > 0 ? 1 : 0)
-        if (page < 1 || page > pages) return msg.reply('Page index out of bounds.')
+        if (page < 1 || page > pages) return 'Page index out of bounds.'
         const startIndex = (page - 1) * commandsPerPage
         let pageCommands = new Array<Command>()
         for (const command of commandMap)
@@ -34,20 +45,26 @@ class Help extends Command {
         pageCommands = pageCommands.slice(startIndex, startIndex + commandsPerPage)
 
         const embed = new MessageEmbed().setTitle(`Help - page ${page} of ${pages}`)
-        for (const command of pageCommands) embed.addField(command.commandName, command.description)
+        embed.setDescription('**Bot commands:**\n' +
+            pageCommands.map(command =>
+                `**${command.commandName}** - ${command.description}`
+            ).join('\n')
+        )
+        embed.addField('Developer', 'Jompda#3091')
+        embed.setTimestamp()
 
-        msg.reply({ embeds: [embed] })
+        return { embeds: [embed] }
     }
-    static printCommandUsage(msg: Message, commandName: string) {
-        const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
-        if (!command) return msg.reply(`Unrecognized command name **${commandName}**.`)
-        msg.reply({
+    static constructCommandUsage(isGuild: boolean, commandName: string) {
+        const command = (isGuild ? guildCommands : privateCommands).get(commandName)
+        if (!command) return `Unrecognized command name **${commandName}**.`
+        return {
             embeds: [new MessageEmbed()
                 .setTitle(commandName)
                 .addField('Description', command.description)
                 .addField('Usage', db.defaultDBGuild.prefix + command.usage)
             ]
-        })
+        }
     }
 }
 

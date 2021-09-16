@@ -1,7 +1,6 @@
 import { Client, Intents, User } from 'discord.js'
 import { REST } from '@discordjs/rest'
 import { Routes } from 'discord-api-types/v9'
-import { SlashCommandBuilder, SlashCommandStringOption } from '@discordjs/builders'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -35,7 +34,7 @@ import * as db from './database'
 initializeCommands()
 
 
-console.log('Connecting to Discord API ..')
+console.log('Connecting to the Discord API ..')
 bot.client.once('ready', () => {
     if (!bot.client.user) return console.log(`Couldn't log in!`)
     console.log(`Successfully logged in as ${bot.client.user.tag}!`)

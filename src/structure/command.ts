@@ -1,22 +1,34 @@
-import { Message } from 'discord.js'
-import { SlashCommandBuilder, SlashCommandStringOption } from '@discordjs/builders'
+import { Interaction, Message } from 'discord.js'
+
+
+const optionTypes = new Map<string, number>([
+    ['boolean', 5],
+    ['channel', 7],
+    ['integer', 4],
+    ['mentionable', 9],
+    ['number', 10],
+    ['role', 8],
+    ['string', 3],
+    ['user', 6]
+])
 
 
 type Context = 'guild' | 'private'
 
 
 interface CommandParameter {
-    // TODO: Add support for special parameter types such as User or Number.
+    // TODO: Add support for choices.
     parameterName: string
-    value: string
-    required: boolean
+    valueType: string
+    description: string
+    required?: boolean
 }
 
 
 interface CommandSwitch {
     switchName: string
     description: string
-    expectedValue?: string
+    expectedValueType?: string
 }
 
 
@@ -68,32 +80,39 @@ abstract class Command {
         return this.contexts.find(temp => temp === context)
     }
     toSlashCommand() {
-        const builder = new SlashCommandBuilder()
-            .setName(this.commandName)
-            .setDescription(this.description)
-        if (this.parameters) for (const parameter of this.parameters)
-            builder.addStringOption(
-                new SlashCommandStringOption()
-                    .setName(parameter.parameterName)
-                    .setDescription(parameter.value)
-                    .setRequired(parameter.required)
-            )
-        return builder.toJSON()
+        const command = {
+            name: this.commandName,
+            description: this.description,
+            options: new Array<any>(),
+            defaultPermission: undefined
+        }
+        if (this.parameters) for (const parameter of this.parameters) {
+            command.options.push({
+                name: parameter.parameterName,
+                description: parameter.description,
+                required: parameter.required,
+                type: optionTypes.get(parameter.valueType)
+            })
+        }
+        return command
     }
-    abstract run(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
+    abstract onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
+    abstract onInteraction(interaction: Interaction): any
 }
 
 
 function constructUsage(options: CommandOptions) {
-    let result = options.commandName
-    let parameterSwitches = new Array<string>()
-    if (options.parameters) for (const temp of options.parameters) {
-        result += ` ${!temp.required ? '[' : '<'}${temp.parameterName}${temp.required ? ']' : '>'}${temp.value ? ': ' + temp.value : ''}`
-    }
-    if (options.switches) for (const temp of options.switches) {
-        parameterSwitches.push(`-${temp.switchName}${temp.expectedValue ? ` <${temp.expectedValue}>` : ''}${temp.description ? ' ' + temp.description : ''}`)
-    }
-    return result + (parameterSwitches.length > 0 ? '\n*Switches:*\n' + parameterSwitches.join('\n') : '')
+    return options.commandName + (options.parameters
+        ? options.parameters.map(temp =>
+            ` ${!temp.required ? '[' : '<'}${temp.parameterName + (temp.valueType ? ': ' + temp.valueType : '')}${!temp.required ? ']' : '>'}`
+        ).join('')
+        : ''
+    ) + (options.switches
+        ? '\n' + options.switches.map(temp =>
+            `-${temp.switchName}${temp.expectedValueType ? ` <${temp.expectedValueType}>` : ''}${temp.description ? ' ' + temp.description : ''}`
+        ).join('\n')
+        : ''
+        )
 }
 
 
