@@ -67,12 +67,8 @@ function synchronizeGuilds() {
                 .then(guilds => {
                     for (const [guildId, guild] of guilds) {
                         const row = rows.find(row => row.guildId === guildId)
-                        if (row) {
-                            cache.guilds.set(guildId, new DBGuild({
-                                guildId: guildId,
-                                prefix: row.prefix
-                            }))
-                        } else {
+                        if (row) cache.guilds.set(guildId, new DBGuild(row))
+                        else {
                             cache.guilds.set(guildId, new DBGuild({ ...{ guildId }, ...defaultDBGuild }))
                             db.run('INSERT INTO guild VALUES (?, ?)', [
                                 guildId,
