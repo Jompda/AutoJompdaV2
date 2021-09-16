@@ -88,6 +88,7 @@ function synchronizeGuilds() {
 
 
 export {
+    defaultDBGuild,
     DBGuild,
     serialize,
     close,

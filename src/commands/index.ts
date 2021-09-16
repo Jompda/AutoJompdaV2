@@ -33,7 +33,7 @@ forEachFile(
 
 
 function interpret(msg: Message) {
-    const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : bot.defaultPrefix.length)
+    const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : db.defaultDBGuild.prefix.length)
     const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
     const commandName = rawParam.shift()?.toLowerCase()
     if (!commandName) throw new UserError(`Yup.. That's the prefix..`)

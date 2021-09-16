@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js'
 import { commands, guildCommands, privateCommands } from '..'
-import bot from '../..'
 import { Command } from '../../structure/command'
+import * as db from '../../database'
 
 
 const commandsPerPage = 10
@@ -45,7 +45,7 @@ class Help extends Command {
             embeds: [new MessageEmbed()
                 .setTitle(commandName)
                 .addField('Description', command.description)
-                .addField('Usage', bot.defaultPrefix + command.usage)
+                .addField('Usage', db.defaultDBGuild.prefix + command.usage)
             ]
         })
     }

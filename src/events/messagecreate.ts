@@ -13,7 +13,7 @@ class MessageCreate extends Event {
     }
     run(msg: Message) {
         if (msg.author === bot.client.user) return
-        const prefix = msg.guild ? db.cache.getGuild(msg.guild.id).prefix : bot.defaultPrefix
+        const prefix = msg.guild ? db.cache.getGuild(msg.guild.id).prefix : db.defaultDBGuild.prefix
         if (msg.content.startsWith(prefix))
             try { return interpret(msg) }
             catch (err) {

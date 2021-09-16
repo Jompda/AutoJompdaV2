@@ -3,9 +3,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 
-import * as config from './config.json'
-
-
 const bot = {
     client: new Client({
         intents: [
@@ -17,7 +14,6 @@ const bot = {
             'CHANNEL'
         ]
     }),
-    defaultPrefix: config.defaultPrefix,
     exit,
     exiting: false,
     debugMode: true
