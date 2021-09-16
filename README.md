@@ -3,10 +3,10 @@ A multipurpose Discord bot developed by Joni Rapo.
 
 
 ## .env
-VARIABLE | VALUE
----------|------
-DISCORD_TOKEN | \<get it from the discord developer portal>
-DEVELOPER_DISCORD_CLIENT_ID | [only used when `debugMode` is set to true in the `bot object`]
+Variable | Required | Value | Description
+---------|----------|-------|------------
+DISCORD_TOKEN | * | token | Get it from the discord developer portal.
+DEVELOPER_DISCORD_CLIENT_ID || Snowflake ID | Only used when `debugMode` is set to true in the `bot object`.
 
 
 ## TODO
