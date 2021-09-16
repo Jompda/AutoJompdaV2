@@ -1,4 +1,4 @@
-import * as dcjs from 'discord.js'
+import { Client, Intents } from 'discord.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -7,11 +7,11 @@ import * as config from './config.json'
 
 
 const bot = {
-    client: new dcjs.Client({
+    client: new Client({
         intents: [
-            dcjs.Intents.FLAGS.GUILDS,
-            dcjs.Intents.FLAGS.GUILD_MESSAGES,
-            dcjs.Intents.FLAGS.DIRECT_MESSAGES
+            Intents.FLAGS.GUILDS,
+            Intents.FLAGS.GUILD_MESSAGES,
+            Intents.FLAGS.DIRECT_MESSAGES
         ],
         partials: [
             'CHANNEL'
