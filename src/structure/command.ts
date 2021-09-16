@@ -6,6 +6,7 @@ type Context = 'guild' | 'private'
 
 
 interface CommandParameter {
+    // TODO: Add support for special parameter types such as User or Number.
     parameterName: string
     value: string
     required: boolean
