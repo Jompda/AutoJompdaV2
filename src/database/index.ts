@@ -1,5 +1,5 @@
 import * as sqlite from 'sqlite3'
-import bot from '.'
+import bot from '..'
 
 
 const db = new (sqlite.verbose()).Database('database.sqlite3')

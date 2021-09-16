@@ -27,7 +27,7 @@ const bot = {
 export default bot
 import './commands'
 import { initializeEvents } from './events'
-import * as db from './databasemanager'
+import * as db from './database'
 
 
 console.log('Connecting to Discord API ..')

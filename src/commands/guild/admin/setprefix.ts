@@ -1,6 +1,6 @@
 import { Message, Permissions } from 'discord.js'
 import { Command } from '../../../structure/command'
-import * as db from '../../../databasemanager'
+import * as db from '../../../database'
 
 
 class SetPrefix extends Command {

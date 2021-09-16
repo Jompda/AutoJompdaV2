@@ -3,7 +3,7 @@ import bot from '..'
 import { Command } from '../structure/command'
 import UserError from '../structure/usererror'
 import { forEachFile, stringifyPermission } from '../util'
-import * as db from '../databasemanager'
+import * as db from '../database'
 
 
 const commands = new Map<string, Command>()

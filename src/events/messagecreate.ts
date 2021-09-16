@@ -4,7 +4,7 @@ import bot from '..'
 import { interpret } from '../commands'
 import { resolveTagId } from '../util'
 import UserError from '../structure/usererror'
-import * as dbManager from '../databasemanager'
+import * as dbManager from '../database'
 
 
 class MessageCreate extends Event {
