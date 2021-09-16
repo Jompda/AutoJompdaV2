@@ -1,5 +1,6 @@
 import * as sqlite from 'sqlite3'
 import bot from '..'
+import defaultDBGuild from './defaultdbguild.json'
 
 
 const db = new (sqlite.verbose()).Database('database.sqlite3')
@@ -8,9 +9,9 @@ const db = new (sqlite.verbose()).Database('database.sqlite3')
 class DBGuild {
     guildId: string
     prefix: string
-    constructor(obj: any) {
-        this.guildId = obj.guildId
-        this.prefix = obj.prefix
+    constructor(dbGuildResolvable: any) {
+        this.guildId = dbGuildResolvable.guildId
+        this.prefix = dbGuildResolvable.prefix
     }
     update() {
         return new Promise<void>((resolve, reject) => {
@@ -65,21 +66,20 @@ function synchronizeGuilds() {
             bot.client.guilds.fetch()
                 .then(guilds => {
                     for (const [guildId, guild] of guilds) {
-                        const dbGuild = new DBGuild({
-                            guildId: guildId,
-                            prefix: bot.defaultPrefix
-                        })
-                        cache.guilds.set(guildId, dbGuild)
                         const row = rows.find(row => row.guildId === guildId)
                         if (row) {
-                            dbGuild.prefix = row.prefix
-                            continue
+                            cache.guilds.set(guildId, new DBGuild({
+                                guildId: guildId,
+                                prefix: row.prefix
+                            }))
+                        } else {
+                            cache.guilds.set(guildId, new DBGuild({ ...{ guildId }, ...defaultDBGuild }))
+                            db.run('INSERT INTO guild VALUES (?, ?)', [
+                                guildId,
+                                defaultDBGuild.prefix
+                            ])
+                            console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
                         }
-                        db.run('INSERT INTO guild VALUES (?, ?)', [
-                            guildId,
-                            dbGuild.prefix
-                        ])
-                        console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
                     }
                     // Lazy af
                     console.log('Synchronization finished.')
