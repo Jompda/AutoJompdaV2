@@ -21,7 +21,8 @@ const bot = {
     rest: new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN as string),
     exit,
     exiting: false,
-    debugMode: true
+    debugMode: true,
+    developerUser: null as unknown as User | null
 }
 
 
@@ -38,6 +39,11 @@ console.log('Connecting to the Discord API ..')
 bot.client.once('ready', () => {
     if (!bot.client.user) return console.log(`Couldn't log in!`)
     console.log(`Successfully logged in as ${bot.client.user.tag}!`)
+
+    if (process.env.DEVELOPER_DISCORD_CLIENT_ID)
+        bot.client.users.fetch(process.env.DEVELOPER_DISCORD_CLIENT_ID as string)
+            .then(developerUser => bot.developerUser = developerUser)
+
     bot.client.guilds.fetch().then(guilds => {
         const guildSlashCommands = new Array<object>()
         for (const [commandName, command] of guildCommands)

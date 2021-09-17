@@ -1,7 +1,8 @@
-import { CommandInteraction, Interaction, Message, MessageEmbed } from 'discord.js'
+import { CommandInteraction, Interaction, Message, MessageEmbed, User } from 'discord.js'
 import { commands, guildCommands, privateCommands } from '..'
 import { Command } from '../../structure/command'
 import * as db from '../../database'
+import bot from '../..'
 
 
 const commandsPerPage = 10
@@ -50,7 +51,7 @@ class Help extends Command {
                 `**${command.commandName}** - ${command.description}`
             ).join('\n')
         )
-        embed.addField('Developer', 'Jompda#3091')
+        if (bot.developerUser) embed.addField('Developer', bot.developerUser.tag)
         embed.setTimestamp()
 
         return { embeds: [embed] }

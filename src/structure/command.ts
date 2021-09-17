@@ -65,7 +65,8 @@ abstract class Command {
             for (let i = 0; i < options.parameters.length; i++)
                 if (!options.parameters[i].required) lastWasOptional = true
                 else {
-                    if (lastWasOptional) throw new Error(`Required parameters cannot come after optional parameters!`)
+                    if (lastWasOptional)
+                        throw new Error(`Required parameters cannot come after optional parameters!`)
                     this.requiredParameters++
                 }
         this.switches = options.switches
@@ -104,12 +105,16 @@ abstract class Command {
 function constructUsage(options: CommandOptions) {
     return options.commandName + (options.parameters
         ? options.parameters.map(temp =>
-            ` ${!temp.required ? '[' : '<'}${temp.parameterName + (temp.valueType ? ': ' + temp.valueType : '')}${!temp.required ? ']' : '>'}`
+            ' ' + (!temp.required ? '[' : '<') +
+            temp.parameterName + (temp.valueType ? ': ' + temp.valueType : '') +
+            (!temp.required ? ']' : '>')
         ).join('')
         : ''
     ) + (options.switches
         ? '\n' + options.switches.map(temp =>
-            `-${temp.switchName}${temp.expectedValueType ? ` <${temp.expectedValueType}>` : ''}${temp.description ? ' ' + temp.description : ''}`
+            '-' + temp.switchName +
+            (temp.expectedValueType ? ` <${temp.expectedValueType}>` : '') +
+            (temp.description ? ' ' + temp.description : '')
         ).join('\n')
         : ''
         )

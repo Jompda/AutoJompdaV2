@@ -1,6 +1,7 @@
-import { Message, Permissions } from 'discord.js'
+import { GuildMember, Message, Permissions } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
+import UserError from './structure/usererror'
 
 
 function forEachFile(currentPath: string, filter = (filepath: string, filename: string) => true, predicate: (filepath: string) => any) {
@@ -13,9 +14,14 @@ function forEachFile(currentPath: string, filter = (filepath: string, filename: 
 
 
 function resolveMember(msg: Message, start = 0) {
-    if (!msg.guild) throw new Error(`Cannot resolve member without a guild.`)
-    const userId = resolveTagId(msg.content, start)
-    return userId ? msg.guild.members.resolve(userId) : undefined
+    return new Promise<GuildMember | null>((resolve, reject) => {
+        if (!msg.guild) return reject(new Error(`Cannot resolve member without a guild!`))
+        const userId = resolveTagId(msg.content, start)
+        if (!userId) return reject(new UserError(`Unresolvable id!`))
+        msg.guild.members.fetch(userId)
+            .then(resolve)
+            .catch(() => reject(new UserError(`Member doesn't exist!`)))
+    })
 }
 
 
