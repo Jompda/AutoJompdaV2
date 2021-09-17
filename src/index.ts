@@ -1,6 +1,5 @@
 import { Client, Intents, User } from 'discord.js'
 import { REST } from '@discordjs/rest'
-import { Routes } from 'discord-api-types/v9'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -27,12 +26,9 @@ const bot = {
 
 
 export default bot
-import { initializeCommands, guildCommands, privateCommands } from './commands'
+import { initializeCommands } from './commands'
 import { initializeEvents } from './events'
 import * as db from './database'
-
-
-initializeCommands()
 
 
 console.log('Connecting to the Discord API ..')
@@ -44,28 +40,8 @@ bot.client.once('ready', () => {
         bot.client.users.fetch(process.env.DEVELOPER_DISCORD_CLIENT_ID as string)
             .then(developerUser => bot.developerUser = developerUser)
 
-    bot.client.guilds.fetch().then(guilds => {
-        const guildSlashCommands = new Array<object>()
-        for (const iter of guildCommands)
-            if (!privateCommands.has(iter[1].commandName))
-                guildSlashCommands.push(iter[1].toSlashCommand())
-        const privateSlashCommands = new Array<object>()
-        for (const iter of privateCommands)
-            privateSlashCommands.push(iter[1].toSlashCommand())
-
-        bot.rest.put(
-            Routes.applicationCommands((bot.client.user as User).id),
-            { body: privateSlashCommands }
-        ).then(() => {
-            bot.rest.get(Routes.applicationCommands((bot.client.user as User).id)).then((res) => {
-                console.log(JSON.stringify(res, undefined, 4))
-            })
-        })
-        for (const [guildId] of guilds)
-            bot.rest.put(
-                Routes.applicationGuildCommands((bot.client.user as User).id, guildId),
-                { body: guildSlashCommands }
-            )
+    bot.client.guilds.fetch().then(() => {
+        initializeCommands()
         db.serialize()
             .then(initializeEvents)
             .catch((err) => {

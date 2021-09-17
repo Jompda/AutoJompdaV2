@@ -1,14 +1,17 @@
-import { GuildMember, Message, MessageEmbed, User } from 'discord.js'
+import { Guild, GuildMember, Message, MessageEmbed, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
 import UserError from '../structure/usererror'
 import { forEachFile, stringifyPermission } from '../util'
 import * as db from '../database'
+import { Routes } from 'discord-api-types/v9'
 
 
 const commands = new Map<string, Command>()
 const guildCommands = new Map<string, Command>()
+const guildSlashCommands = new Array<object>()
 const privateCommands = new Map<string, Command>()
+const privateSlashCommands = new Array<object>()
 
 
 function initializeCommands() {
@@ -30,6 +33,28 @@ function initializeCommands() {
                 console.error(err)
             }
         }
+    )
+
+
+    for (const iter of privateCommands)
+        privateSlashCommands.push(iter[1].toSlashCommand())
+    bot.rest.put(
+        Routes.applicationCommands((bot.client.user as User).id),
+        { body: privateSlashCommands }
+    )
+
+    for (const iter of guildCommands)
+        if (!privateCommands.has(iter[1].commandName))
+            guildSlashCommands.push(iter[1].toSlashCommand())
+    for (const [guildId] of bot.client.guilds.cache)
+        initializeGuild(guildId)
+}
+
+
+function initializeGuild(guildId: string) {
+    bot.rest.put(
+        Routes.applicationGuildCommands((bot.client.user as User).id, guildId),
+        { body: guildSlashCommands }
     )
 }
 
@@ -96,5 +121,6 @@ export {
     guildCommands,
     privateCommands,
     initializeCommands,
+    initializeGuild,
     interpret
 }
