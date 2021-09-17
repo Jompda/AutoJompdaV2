@@ -1,4 +1,4 @@
-import { CommandInteraction, Interaction, Message, MessageEmbed, User } from 'discord.js'
+import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { commands, guildCommands, privateCommands } from '..'
 import { Command } from '../../structure/command'
 import * as db from '../../database'
