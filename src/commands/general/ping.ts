@@ -16,7 +16,7 @@ class Ping extends Command {
             .catch(console.error)
     }
     onInteraction(interaction: CommandInteraction) {
-
+        interaction.reply(`Slash command not implemented yet!`)
     }
 }
 

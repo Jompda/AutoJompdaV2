@@ -10,6 +10,7 @@ class InteractionCreate extends Event {
         super({ eventName: 'interactionCreate' })
     }
     run(interaction: Interaction) {
+        console.log(interaction)
         if (!interaction.isCommand()) return
         if (interaction.user.id === (bot.client.user as User).id) return
         const command = (interaction.guild ? guildCommands : privateCommands).get(interaction.commandName)

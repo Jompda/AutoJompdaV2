@@ -47,7 +47,8 @@ bot.client.once('ready', () => {
     bot.client.guilds.fetch().then(guilds => {
         const guildSlashCommands = new Array<object>()
         for (const iter of guildCommands)
-            guildSlashCommands.push(iter[1].toSlashCommand())
+            if (!privateCommands.has(iter[1].commandName))
+                guildSlashCommands.push(iter[1].toSlashCommand())
         const privateSlashCommands = new Array<object>()
         for (const iter of privateCommands)
             privateSlashCommands.push(iter[1].toSlashCommand())
@@ -55,7 +56,11 @@ bot.client.once('ready', () => {
         bot.rest.put(
             Routes.applicationCommands((bot.client.user as User).id),
             { body: privateSlashCommands }
-        )
+        ).then(() => {
+            bot.rest.get(Routes.applicationCommands((bot.client.user as User).id)).then((res) => {
+                console.log(JSON.stringify(res, undefined, 4))
+            })
+        })
         for (const [guildId] of guilds)
             bot.rest.put(
                 Routes.applicationGuildCommands((bot.client.user as User).id, guildId),

@@ -21,7 +21,7 @@ class EchoParsed extends Command {
         msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```')
     }
     onInteraction(interaction: CommandInteraction) {
-
+        interaction.reply(`Slash command not implemented yet!`)
     }
 }
 
