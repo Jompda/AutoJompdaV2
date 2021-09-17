@@ -27,7 +27,7 @@ const bot = {
 
 
 export default bot
-import { initializeCommands, commands, guildCommands, privateCommands } from './commands'
+import { initializeCommands, guildCommands, privateCommands } from './commands'
 import { initializeEvents } from './events'
 import * as db from './database'
 
@@ -46,11 +46,11 @@ bot.client.once('ready', () => {
 
     bot.client.guilds.fetch().then(guilds => {
         const guildSlashCommands = new Array<object>()
-        for (const [commandName, command] of guildCommands)
-            guildSlashCommands.push(command.toSlashCommand())
+        for (const iter of guildCommands)
+            guildSlashCommands.push(iter[1].toSlashCommand())
         const privateSlashCommands = new Array<object>()
-        for (const [commandName, command] of privateCommands)
-            privateSlashCommands.push(command.toSlashCommand())
+        for (const iter of privateCommands)
+            privateSlashCommands.push(iter[1].toSlashCommand())
 
         bot.rest.put(
             Routes.applicationCommands((bot.client.user as User).id),
