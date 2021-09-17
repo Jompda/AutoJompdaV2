@@ -1,6 +1,7 @@
-import { Interaction, Message, Permissions } from 'discord.js'
+import { CommandInteraction, Message, Permissions } from 'discord.js'
 import { Command } from '../../../structure/command'
 import * as db from '../../../database'
+import UserError from '../../../structure/usererror'
 
 
 class SetPrefix extends Command {
@@ -19,19 +20,37 @@ class SetPrefix extends Command {
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {
-        const dbGuild = db.cache.getGuild(msg.guildId as string)
-        const parsedPrefix = parameters[0] as string
-        if (parsedPrefix === dbGuild.prefix) return msg.reply(`That's the old one m8!`)
-        dbGuild.prefix = parsedPrefix
-        dbGuild.update()
+        const prefix = parameters[0] as string
+        this.updatePrefix(msg.guildId as string, prefix)
             .then(() => msg.reply(`Successfully updated the command prefix for the server!`))
             .catch((err) => {
-                msg.reply(`Something went wrong while updating the command prefix for the server!`)
-                console.error('SetPrefix:', err.message, err.stack)
+                msg.reply(err.message)
             })
     }
-    onInteraction(interaction: Interaction) {
-
+    onInteraction(interaction: CommandInteraction) {
+        // Could be optimized by deferring and updating the prefix at the same time.
+        interaction.deferReply().then(() => {
+            const prefix = interaction.options.get('prefix')?.value as string
+            this.updatePrefix(interaction.guildId as string, prefix)
+                .then(() => interaction.editReply(`Successfully updated the command prefix for the server!`))
+                .catch((err) => {
+                    if (err instanceof UserError) return interaction.editReply(err.message)
+                    throw err
+                })
+        })
+    }
+    private updatePrefix(guildId: string, prefix: string) {
+        return new Promise<void>((resolve, reject) => {
+            const dbGuild = db.cache.getGuild(guildId)
+            if (prefix === dbGuild.prefix) return reject(new UserError(`That's the old one m8!`))
+            dbGuild.prefix = prefix
+            dbGuild.update()
+                .then(resolve)
+                .catch((err) => {
+                    console.error('SetPrefix:', err.message, err.stack)
+                    reject(new UserError(`Something went wrong while updating the command prefix for the server!`))
+                })
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-import { Interaction, Message } from 'discord.js'
+import { CommandInteraction, Message } from 'discord.js'
 import { Command } from '../../structure/command'
 
 
@@ -20,7 +20,7 @@ class EchoParsed extends Command {
         switches.forEach((value, key) => switchObj[key] = value)
         msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```')
     }
-    onInteraction(interaction: Interaction) {
+    onInteraction(interaction: CommandInteraction) {
 
     }
 }

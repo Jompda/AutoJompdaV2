@@ -29,10 +29,10 @@ class Help extends Command {
             : Help.constructHelpMenu(Boolean(msg.guild), page))
     }
     onInteraction(interaction: CommandInteraction) {
-        const parsedParameter = interaction.options.get('option')?.value as string ?? ''
-        const page = parseInt(parsedParameter || '1')
+        const option = interaction.options.get('option')?.value as string ?? ''
+        const page = parseInt(option || '1')
         interaction.reply(isNaN(page)
-            ? Help.constructCommandUsage(Boolean(interaction.guild), parsedParameter)
+            ? Help.constructCommandUsage(Boolean(interaction.guild), option)
             : Help.constructHelpMenu(Boolean(interaction.guild), page))
     }
     static constructHelpMenu(isGuild: boolean, page: number) {

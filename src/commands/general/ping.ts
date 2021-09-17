@@ -1,4 +1,4 @@
-import { Interaction, Message } from 'discord.js'
+import { CommandInteraction, Message } from 'discord.js'
 import { Command } from '../../structure/command'
 
 
@@ -15,7 +15,7 @@ class Ping extends Command {
             .then(replyMsg => replyMsg.edit(`Ping **${replyMsg.createdTimestamp - msg.createdTimestamp}ms**`))
             .catch(console.error)
     }
-    onInteraction(interaction: Interaction) {
+    onInteraction(interaction: CommandInteraction) {
 
     }
 }
