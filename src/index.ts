@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 
+import { parseParametersAndSwitches } from './interpreter'
 
 
 const bot = {
@@ -21,7 +22,11 @@ const bot = {
     exit,
     exiting: false,
     debugMode: true,
-    developerUser: null as unknown as User | null
+    developerUser: null as unknown as User | null,
+    launchOptions: parseParametersAndSwitches(undefined, [{
+        switchName: '-update-slash-commands',
+        description: 'Updates the slash commands.'
+    }], process.argv.slice(2))
 }
 
 

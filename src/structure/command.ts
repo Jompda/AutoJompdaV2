@@ -78,7 +78,7 @@ abstract class Command {
         this.debug = options.debug ?? false
     }
     hasContext(context: Context) {
-        return this.contexts.find(temp => temp === context)
+        return Boolean(this.contexts?.find(temp => temp === context))
     }
     toSlashCommand() {
         const command = {

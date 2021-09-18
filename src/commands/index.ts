@@ -1,17 +1,16 @@
-import { Guild, GuildMember, Message, MessageEmbed, User } from 'discord.js'
+import { GuildMember, Message, MessageEmbed, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
 import UserError from '../structure/usererror'
 import { forEachFile, stringifyPermission } from '../util'
 import * as db from '../database'
 import { Routes } from 'discord-api-types/v9'
+import { parseParametersAndSwitches } from '../interpreter'
 
 
 const commands = new Map<string, Command>()
 const guildCommands = new Map<string, Command>()
-const guildSlashCommands = new Array<object>()
 const privateCommands = new Map<string, Command>()
-const privateSlashCommands = new Array<object>()
 
 
 function initializeCommands() {
@@ -35,23 +34,28 @@ function initializeCommands() {
         }
     )
 
+    if (bot.launchOptions.parsedSwitches.has('-update-slash-commands')) {
+        console.log(`Updating slash commands ..`)
+        const privateSlashCommands = new Array<object>()
+        for (const iter of privateCommands)
+            privateSlashCommands.push(iter[1].toSlashCommand())
+        bot.rest.put(
+            Routes.applicationCommands((bot.client.user as User).id),
+            { body: privateSlashCommands }
+        )
 
-    for (const iter of privateCommands)
-        privateSlashCommands.push(iter[1].toSlashCommand())
-    bot.rest.put(
-        Routes.applicationCommands((bot.client.user as User).id),
-        { body: privateSlashCommands }
-    )
+        const guildSlashCommands = new Array<object>()
+        for (const iter of guildCommands)
+            if (!privateCommands.has(iter[1].commandName))
+                guildSlashCommands.push(iter[1].toSlashCommand())
+        for (const [guildId] of bot.client.guilds.cache)
+            updateGuildCommands(guildId, guildSlashCommands)
+    }
 
-    for (const iter of guildCommands)
-        if (!privateCommands.has(iter[1].commandName))
-            guildSlashCommands.push(iter[1].toSlashCommand())
-    for (const [guildId] of bot.client.guilds.cache)
-        initializeGuild(guildId)
 }
 
 
-function initializeGuild(guildId: string) {
+function updateGuildCommands(guildId: string, guildSlashCommands: Array<object>) {
     bot.rest.put(
         Routes.applicationGuildCommands((bot.client.user as User).id, guildId),
         { body: guildSlashCommands }
@@ -83,29 +87,14 @@ function interpret(msg: Message) {
         }
     }
 
-    const parsedParameters = new Array<string>()
-    const parsedSwitches = new Map<string, string | null>()
-    if (command.parameters || command.switches) {
-        let parameterIndex = 0
-        for (let i = 0; i < rawParam.length; i++) {
-            if (!rawParam[i].startsWith('-')) {
-                parameterIndex++
-                parsedParameters.push(rawParam[i])
-            } else {
-                if (!command.switches) return msg.reply(`Command doesn't have any switches so why did you define one?`)
-                const switchName = rawParam[i].slice(1)
-                const match = command.switches.find(temp => temp.switchName === switchName)
-                if (!match) return msg.reply(`Unknown switch **${switchName}**`)
-                parsedSwitches.set(switchName, match.expectedValueType ? rawParam[++i] : null)
-            }
-        }
-    }
-    if (parsedParameters.length < command.requiredParameters) throw new UserError(`Not enough parameters!`)
+    const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
+    if (parsed.parsedParameters.length < command.requiredParameters) throw new UserError(`Not enough parameters!`)
 
-    command.onMessage(msg, parsedParameters, parsedSwitches)
+    command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
 }
 
 
+// TODO: Use a Promise to fetch the member permissions.
 function checkPermissions(member: GuildMember | null, permissions: Array<bigint>) {
     if (!member) throw new Error('Member undefined')
     const missingPermissions = new Array<string>()
@@ -121,6 +110,6 @@ export {
     guildCommands,
     privateCommands,
     initializeCommands,
-    initializeGuild,
+    updateGuildCommands,
     interpret
 }
