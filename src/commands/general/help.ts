@@ -48,11 +48,11 @@ class Help extends Command {
 
         const embed = new MessageEmbed().setTitle(`Help - page ${page} of ${pages}`)
         embed.setDescription('**Bot commands:**\n' +
-            pageCommands.map(command => {
-                return (command.slash ? '/' : '') +
-                    (command.debug ? `_**${command.commandName}**_` : `**${command.commandName}**`) +
-                    ` - ${command.description}`
-            }).join('\n')
+            pageCommands.map(command =>
+                (command.slash ? '/' : '') +
+                (command.debug ? `_**${command.commandName}**_` : `**${command.commandName}**`) +
+                ` - ${command.description}`
+            ).join('\n')
         )
         if (bot.developerUser) embed.addField('Developer', bot.developerUser.tag)
         embed.setTimestamp()
