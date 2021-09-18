@@ -7,7 +7,7 @@
     "scripts": {
         "build": "rmdir target /s /q & tsc --build",
         "start": "node .",
-        "test": "npm run build && npm run start"
+        "test": "npm run build && npm run start -- -debug"
     },
     "license": "ISC",
     "dependencies": {
