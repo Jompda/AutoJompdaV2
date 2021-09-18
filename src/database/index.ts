@@ -39,6 +39,7 @@ const cache = {
 function serialize() {
     return new Promise<void>((resolve, reject) => {
         db.serialize(() => {
+            console.log('Serializing the database ..')
             db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT)')
             synchronizeGuilds()
                 .then(resolve)

@@ -18,7 +18,8 @@ class Help extends Command {
                 valueType: 'string'
             }],
             description: 'Displays a help menu.',
-            contexts: ['guild', 'private']
+            contexts: ['guild', 'private'],
+            slash: true
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {

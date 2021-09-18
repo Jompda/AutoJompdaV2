@@ -16,7 +16,8 @@ class SetPrefix extends Command {
             }],
             description: 'Sets the command prefix used on the server.',
             contexts: ['guild'],
-            memberPermissions: [Permissions.FLAGS.ADMINISTRATOR]
+            memberPermissions: [Permissions.FLAGS.ADMINISTRATOR],
+            slash: true
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {

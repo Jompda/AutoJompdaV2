@@ -35,10 +35,11 @@ function initializeCommands() {
     )
 
     if (bot.launchOptions.parsedSwitches.has('-update-slash-commands')) {
-        console.log(`Updating slash commands ..`)
+        console.log('Updating slash commands ..')
         const privateSlashCommands = new Array<object>()
         for (const iter of privateCommands)
-            privateSlashCommands.push(iter[1].toSlashCommand())
+            if (iter[1].slash)
+                privateSlashCommands.push(iter[1].toSlashCommand())
         bot.rest.put(
             Routes.applicationCommands((bot.client.user as User).id),
             { body: privateSlashCommands }
@@ -46,7 +47,7 @@ function initializeCommands() {
 
         const guildSlashCommands = new Array<object>()
         for (const iter of guildCommands)
-            if (!privateCommands.has(iter[1].commandName))
+            if (!privateCommands.has(iter[1].commandName) && iter[1].slash)
                 guildSlashCommands.push(iter[1].toSlashCommand())
         for (const [guildId] of bot.client.guilds.cache)
             updateGuildCommands(guildId, guildSlashCommands)
@@ -69,26 +70,26 @@ function runCommandFromMessage(msg: Message) {
     const commandName = rawParam.shift()?.toLowerCase()
     if (!commandName) throw new UserError(`Yup.. That's the prefix..`)
     const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
-    if (!command) throw new UserError(`Unrecognized command **${commandName}**`)
-    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID) throw new UserError(`This command is only available to developers.`)
+    if (!command) throw new UserError('Unrecognized command **${commandName}**')
+    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID) throw new UserError('This command is only available to developers.')
 
     if (msg.guild) {
         const missingBotPermissions = checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
         const missingMemberPermissions = checkPermissions(msg.member, command.memberPermissions)
         if (missingBotPermissions || missingMemberPermissions) {
-            const embed = new MessageEmbed().setTitle(`Cannot run this command due to:`).setColor('#ff0000')
+            const embed = new MessageEmbed().setTitle('Cannot run this command due to:').setColor('#ff0000')
             if (missingBotPermissions) {
-                embed.addField(`Bot not having the following permissions:`, missingBotPermissions.join(`\n`))
+                embed.addField('Bot not having the following permissions:', missingBotPermissions.join('\n'))
             }
             if (missingMemberPermissions) {
-                embed.addField(`Member not having the following permissions:`, missingMemberPermissions.join(`\n`))
+                embed.addField('Member not having the following permissions:', missingMemberPermissions.join('\n'))
             }
             throw new UserError(embed)
         }
     }
 
     const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
-    if (parsed.parsedParameters.length < command.requiredParameters) throw new UserError(`Not enough parameters!`)
+    if (parsed.parsedParameters.length < command.requiredParameters) throw new UserError('Not enough parameters!')
 
     command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
 }

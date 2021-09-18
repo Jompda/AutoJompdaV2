@@ -21,12 +21,16 @@ const bot = {
     rest: new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN as string),
     exit,
     exiting: false,
-    debugMode: true,
+    debugMode: false,
     developerUser: null as unknown as User | null,
-    launchOptions: parseParametersAndSwitches(undefined, [{
-        switchName: '-update-slash-commands',
-        description: 'Updates the slash commands.'
-    }], process.argv.slice(2))
+    launchOptions: parseParametersAndSwitches(undefined, [
+        { switchName: 'debug', description: 'Enables the debug mode.' },
+        { switchName: '-update-slash-commands', description: 'Updates the slash commands.' }
+    ], process.argv.slice(2))
+}
+if (bot.launchOptions.parsedSwitches.has('debug')) {
+    bot.debugMode = true
+    console.log('Debug mode enabled!')
 }
 
 

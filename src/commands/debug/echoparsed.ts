@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from 'discord.js'
+import { Message } from 'discord.js'
 import { Command } from '../../structure/command'
 
 
@@ -19,9 +19,6 @@ class EchoParsed extends Command {
         const switchObj = {} as any
         switches.forEach((value, key) => switchObj[key] = value)
         msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```')
-    }
-    onInteraction(interaction: CommandInteraction) {
-        interaction.reply(`Slash command not implemented yet!`)
     }
 }
 

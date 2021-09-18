@@ -41,6 +41,7 @@ interface CommandOptions {
     contexts: Array<Context>
     memberPermissions?: Array<bigint>,
     botPermissions?: Array<bigint>,
+    slash?: boolean
     debug?: boolean
 }
 
@@ -55,6 +56,7 @@ abstract class Command {
     contexts: Array<Context>
     memberPermissions: Array<bigint>
     botPermissions: Array<bigint>
+    slash: boolean
     debug: boolean
     constructor(options: CommandOptions) {
         this.commandName = options.commandName
@@ -75,6 +77,7 @@ abstract class Command {
         this.contexts = options.contexts
         this.memberPermissions = options.memberPermissions ?? []
         this.botPermissions = options.botPermissions ?? []
+        this.slash = options.slash ?? false
         this.debug = options.debug ?? false
     }
     hasContext(context: Context) {
@@ -98,7 +101,7 @@ abstract class Command {
         return command
     }
     abstract onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
-    abstract onInteraction(interaction: CommandInteraction): any
+    onInteraction(interaction: CommandInteraction) { }
 }
 
 
