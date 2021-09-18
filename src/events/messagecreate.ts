@@ -1,7 +1,7 @@
 import { Message, User } from 'discord.js'
 import Event from '../structure/event'
 import bot from '..'
-import { interpret } from '../commands'
+import { runCommandFromMessage } from '../commands'
 import { resolveTagId } from '../util'
 import UserError from '../structure/usererror'
 import * as db from '../database'
@@ -15,7 +15,7 @@ class MessageCreate extends Event {
         if (msg.author === bot.client.user) return
         const prefix = msg.guild ? db.cache.getGuild(msg.guild.id).prefix : db.defaultDBGuild.prefix
         if (msg.content.startsWith(prefix))
-            try { return interpret(msg) }
+            try { return runCommandFromMessage(msg) }
             catch (err) {
                 if (err instanceof UserError)
                     msg.reply(err.toMessage()).catch(console.error)
