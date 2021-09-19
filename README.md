@@ -18,6 +18,7 @@ Option | Expected value | Description
 
 ## TODO
 - [x] Add support for slash commands
+- [ ] Events use promises
 - [ ] Persistent logging
 - [ ] Support for a dedicated database
 - [ ] Somewhat error resistant so the bot doesn't go offline on uncaughtException
