@@ -65,7 +65,7 @@ class Help extends Command {
         return {
             embeds: [new MessageEmbed()
                 .setTitle(commandName)
-                .addField('Description', command.description)
+                .addField('Description', command.description + (command.usageDescription ? '\n' + command.usageDescription : ''))
                 .addField('Usage', db.defaultDBGuild.prefix + command.usage)
             ]
         }

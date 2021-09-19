@@ -38,6 +38,7 @@ export default bot
 import { initializeCommands } from './commands'
 import { initializeEvents } from './events'
 import * as db from './database'
+import { asyncOperation } from './util'
 
 
 console.log('Connecting to the Discord API ..')
@@ -48,16 +49,32 @@ bot.client.once('ready', () => {
     if (process.env.DEVELOPER_DISCORD_CLIENT_ID)
         bot.client.users.fetch(process.env.DEVELOPER_DISCORD_CLIENT_ID as string)
             .then(developerUser => bot.developerUser = developerUser)
+            .catch(console.error)
 
-    bot.client.guilds.fetch().then(() => {
-        initializeCommands()
-        db.serialize()
-            .then(initializeEvents)
-            .catch((err) => {
-                console.error(`Fatal database error: ${err.message}\n${err.stack || ''}`)
-                exit()
-            })
-    }).catch(console.error)
+    const check = asyncOperation(2, () => console.log('Bot is ready to serve!'))
+    bot.client.guilds.fetch()
+        .then(() => {
+            initializeCommands()
+                .then(check)
+                .catch(err => {
+                    console.error(`Fatal initialization error: ${JSON.stringify(err.message)}\n${err.stack || ''}`)
+                    exit()
+                })
+            db.serialize()
+                .then(() => {
+                    initializeEvents()
+                        .then(check)
+                        .catch(err => {
+                            console.error(`Fatal initialization error: ${JSON.stringify(err.message)}\n${err.stack || ''}`)
+                            exit()
+                        })
+                })
+                .catch(err => {
+                    console.error(`Fatal database error: ${err.message}\n${err.stack || ''}`)
+                    exit()
+                })
+        })
+        .catch(console.error)
 })
 bot.client.login(process.env.DISCORD_TOKEN)
 

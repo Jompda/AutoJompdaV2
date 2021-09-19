@@ -37,6 +37,7 @@ interface CommandOptions {
     parameters?: Array<CommandParameter>
     switches?: Array<CommandSwitch>
     usage?: string,
+    usageDescription?: string,
     description: string,
     contexts: Array<Context>
     memberPermissions?: Array<bigint>,
@@ -52,6 +53,7 @@ abstract class Command {
     requiredParameters: number
     switches?: Array<CommandSwitch>
     usage: string
+    usageDescription?: string
     description: string
     contexts: Array<Context>
     memberPermissions: Array<bigint>

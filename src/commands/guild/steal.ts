@@ -19,7 +19,7 @@ class Steal extends Command {
                     valueType: 'string'
                 }
             ],
-            usage: 'Attach the emoji or paste the link at the end of the command.',
+            usageDescription: 'Attach the emoji or paste the link at the end of the command.',
             description: 'Yoinks the emoji and adds it to the server.',
             contexts: ['guild'],
             memberPermissions: [Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS],
@@ -28,6 +28,7 @@ class Steal extends Command {
     }
     // TODO: Check the attachment file type before creating the emoji.
     onMessage(msg: Message, parameters: Array<string>) {
+        // Bug: Sometimes thee emoji doesn't show to the bot even though it exists. fetch maybe?
         if (msg.attachments.size + msg.embeds.length < 1) return msg.reply('No emoji defined!')
         if (msg.attachments.size + msg.embeds.length > 1) return msg.reply('Too many emojis defined!')
         if (msg.attachments.size > 0) {

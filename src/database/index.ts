@@ -1,5 +1,6 @@
 import * as sqlite from 'sqlite3'
 import bot from '..'
+import { asyncOperation } from '../util'
 import defaultDBGuild from './defaultdbguild.json'
 
 
@@ -66,21 +67,28 @@ function synchronizeGuilds() {
             if (err) return reject(err)
             bot.client.guilds.fetch()
                 .then(guilds => {
+                    const check = asyncOperation(guilds.size, () => {
+                        console.log('Synchronization finished.')
+                        resolve()
+                    })
                     for (const [guildId, guild] of guilds) {
                         const row = rows.find(row => row.guildId === guildId)
-                        if (row) cache.guilds.set(guildId, new DBGuild(row))
+                        if (row) {
+                            cache.guilds.set(guildId, new DBGuild(row))
+                            check()
+                        }
                         else {
                             cache.guilds.set(guildId, new DBGuild({ ...{ guildId }, ...defaultDBGuild }))
                             db.run('INSERT INTO guild VALUES (?, ?)', [
                                 guildId,
                                 defaultDBGuild.prefix
-                            ])
-                            console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
+                            ], (err) => {
+                                if (err) return reject(err) // TODO: Work around reject getting called multiple times.
+                                console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
+                                check()
+                            })
                         }
                     }
-                    // Lazy af
-                    console.log('Synchronization finished.')
-                    resolve()
                 })
                 .catch(reject)
         })

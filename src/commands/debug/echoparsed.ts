@@ -6,11 +6,11 @@ class EchoParsed extends Command {
     constructor() {
         super({
             commandName: 'echoparsed',
-            description: 'Echoes the parsed parameters and switches back.',
             switches: [
                 { switchName: 'a', description: '1st testswitch' },
                 { switchName: 'b', description: '2nd testswitch', expectedValueType: 'string' }
             ],
+            description: 'Echoes the parsed parameters and switches back.',
             contexts: ['guild', 'private'],
             debug: true
         })

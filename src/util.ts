@@ -37,9 +37,19 @@ function stringifyPermission(value: bigint) {
 }
 
 
+function asyncOperation(calls: number, done: Function) {
+    let called = 0
+    return () => {
+        if (++called === calls) done()
+        else if (called > calls) throw new Error('Received too many calls.')
+    }
+}
+
+
 export {
     forEachFile,
     resolveMember,
     resolveTagId,
-    stringifyPermission
+    stringifyPermission,
+    asyncOperation
 }
