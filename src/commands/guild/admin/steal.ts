@@ -1,4 +1,4 @@
-import { Guild, Message, MessageAttachment } from 'discord.js'
+import { Guild, Message, MessageAttachment, Permissions } from 'discord.js'
 import { Command } from '../../../structure/command'
 
 
@@ -21,7 +21,9 @@ class Steal extends Command {
             ],
             usage: 'Attach the emoji or paste the link at the end of the command.',
             description: 'Yoinks the emoji and adds it to the server.',
-            contexts: ['guild']
+            contexts: ['guild'],
+            memberPermissions: [Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS],
+            botPermissions: [Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS]
         })
     }
     // TODO: Check the attachment file type before creating the emoji.
