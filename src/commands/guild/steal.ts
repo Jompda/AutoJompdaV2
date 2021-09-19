@@ -1,5 +1,5 @@
 import { Guild, Message, MessageAttachment, Permissions } from 'discord.js'
-import { Command } from '../../../structure/command'
+import { Command } from '../../structure/command'
 
 
 class Steal extends Command {
