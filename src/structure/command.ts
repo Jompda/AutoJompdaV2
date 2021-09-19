@@ -43,6 +43,7 @@ interface CommandOptions {
     memberPermissions?: Array<bigint>,
     botPermissions?: Array<bigint>,
     slash?: boolean
+    defer?: boolean
     debug?: boolean
 }
 
@@ -59,6 +60,7 @@ abstract class Command {
     memberPermissions: Array<bigint>
     botPermissions: Array<bigint>
     slash: boolean
+    defer: boolean
     debug: boolean
     constructor(options: CommandOptions) {
         this.commandName = options.commandName
@@ -80,6 +82,7 @@ abstract class Command {
         this.memberPermissions = options.memberPermissions ?? []
         this.botPermissions = options.botPermissions ?? []
         this.slash = options.slash ?? false
+        this.defer = options.defer ?? false
         this.debug = options.debug ?? false
     }
     hasContext(context: Context) {

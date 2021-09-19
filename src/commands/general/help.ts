@@ -19,7 +19,8 @@ class Help extends Command {
             }],
             description: 'Displays a help menu.',
             contexts: ['guild', 'private'],
-            slash: true
+            slash: true,
+            defer: true
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {
@@ -32,7 +33,7 @@ class Help extends Command {
     onInteraction(interaction: CommandInteraction) {
         const option = interaction.options.get('option')?.value as string ?? ''
         const page = parseInt(option || '1')
-        interaction.reply(isNaN(page)
+        interaction.editReply(isNaN(page)
             ? Help.constructCommandUsage(Boolean(interaction.guild), option)
             : Help.constructHelpMenu(Boolean(interaction.guild), page))
     }

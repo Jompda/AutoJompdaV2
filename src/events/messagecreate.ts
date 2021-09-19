@@ -15,7 +15,9 @@ class MessageCreate extends Event {
         if (msg.author === bot.client.user) return
         const prefix = msg.guild ? db.cache.getGuild(msg.guild.id).prefix : db.defaultDBGuild.prefix
         if (msg.content.startsWith(prefix))
-            try { return runCommandFromMessage(msg) }
+            try {
+                return runCommandFromMessage(msg)
+            }
             catch (err) {
                 if (err instanceof UserError)
                     msg.reply(err.toMessage()).catch(console.error)

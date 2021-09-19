@@ -28,7 +28,7 @@ class Steal extends Command {
     }
     // TODO: Check the attachment file type before creating the emoji.
     onMessage(msg: Message, parameters: Array<string>) {
-        // Bug: Sometimes thee emoji doesn't show to the bot even though it exists. fetch maybe?
+        // Bug: Sometimes the emoji doesn't show to the bot even though it exists. fetch maybe?
         if (msg.attachments.size + msg.embeds.length < 1) return msg.reply('No emoji defined!')
         if (msg.attachments.size + msg.embeds.length > 1) return msg.reply('Too many emojis defined!')
         if (msg.attachments.size > 0) {

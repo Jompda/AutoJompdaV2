@@ -1,7 +1,6 @@
 import { GuildMember, Message, MessageEmbed, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
-import UserError from '../structure/usererror'
 import { asyncOperation, forEachFile, stringifyPermission } from '../util'
 import * as db from '../database'
 import { Routes } from 'discord-api-types/v9'
@@ -78,10 +77,11 @@ function runCommandFromMessage(msg: Message) {
     const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : db.defaultDBGuild.prefix.length)
     const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
     const commandName = rawParam.shift()?.toLowerCase()
-    if (!commandName) throw new UserError(`Yup.. That's the prefix..`)
-    const command = (msg.guild ? guildCommands : privateCommands).get(commandName)
-    if (!command) throw new UserError('Unrecognized command **${commandName}**')
-    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID) throw new UserError('This command is only available to developers.')
+    if (!commandName) return msg.reply(`Yup.. That's the prefix..`)
+    const command = (msg.guild ? guildCommands : privateCommands).get(commandName) as Command
+    if (!command) return msg.reply('Unrecognized command **${commandName}**')
+    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID)
+        return msg.reply('This command is only available to developers.')
 
     if (msg.guild) {
         const check = asyncOperation(2, postPermissionCheck)
@@ -93,13 +93,13 @@ function runCommandFromMessage(msg: Message) {
                 missingBotPermissions = result
                 check()
             })
-            .catch(console.error)
+            .catch(console.error) // fatal
         checkPermissions(msg.member, command.memberPermissions)
             .then(result => {
                 missingBotPermissions = result
                 check()
             })
-            .catch(console.error)
+            .catch(console.error) // fatal
 
         function postPermissionCheck() {
             if (missingBotPermissions || missingMemberPermissions) {
@@ -110,15 +110,19 @@ function runCommandFromMessage(msg: Message) {
                 if (missingMemberPermissions) {
                     embed.addField('Member not having the following permissions:', missingMemberPermissions.join('\n'))
                 }
-                throw new UserError(embed)
+                return msg.reply({ embeds: [embed] })
             }
+            finalize()
         }
     }
+    else finalize()
 
-    const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
-    if (parsed.parsedParameters.length < command.requiredParameters) throw new UserError('Not enough parameters!')
+    function finalize() {
+        const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
+        if (parsed.parsedParameters.length < command.requiredParameters) return msg.reply('Not enough parameters!')
 
-    command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
+        command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
+    }
 }
 
 
