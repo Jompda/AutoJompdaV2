@@ -39,7 +39,7 @@ function initializeCommands() {
         const privateSlashCommands = new Array<object>()
         for (const iter of privateCommands)
             if (iter[1].slash)
-                privateSlashCommands.push(iter[1].toSlashCommand())
+                privateSlashCommands.push(iter[1].slashCommand)
         bot.rest.put(
             Routes.applicationCommands((bot.client.user as User).id),
             { body: privateSlashCommands }
@@ -48,11 +48,10 @@ function initializeCommands() {
         const guildSlashCommands = new Array<object>()
         for (const iter of guildCommands)
             if (!privateCommands.has(iter[1].commandName) && iter[1].slash)
-                guildSlashCommands.push(iter[1].toSlashCommand())
+                guildSlashCommands.push(iter[1].slashCommand)
         for (const [guildId] of bot.client.guilds.cache)
             updateGuildCommands(guildId, guildSlashCommands)
     }
-
 }
 
 

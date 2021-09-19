@@ -83,7 +83,7 @@ abstract class Command {
     hasContext(context: Context) {
         return Boolean(this.contexts?.find(temp => temp === context))
     }
-    toSlashCommand() {
+    get slashCommand() {
         const command = {
             name: this.commandName,
             description: this.description,
