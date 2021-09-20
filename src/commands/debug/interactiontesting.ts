@@ -50,7 +50,7 @@ class InteractionTesting extends Command {
                 ]
             })
                 .then(msg => {
-                    for (const id of ids) interactionCreate.getClass().eventEmitter.on(id, handle)
+                    for (const id of ids) interactionCreate.class.eventEmitter.on(id, handle)
                     function handle(interaction: MessageComponentInteraction) {
                         if (interaction.isButton()) interaction.reply('Button: ' + interaction.customId)
                         else if (interaction.isSelectMenu()) interaction.reply('Select menu: ' + interaction.customId + ' ' + interaction.values)

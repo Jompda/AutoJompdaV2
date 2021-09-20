@@ -36,7 +36,7 @@ class InteractionCreate extends Event {
     static nonCommandInteraction(interaction: MessageComponentInteraction) {
         InteractionCreate.eventEmitter.emit(interaction.customId, interaction)
     }
-    getClass() {
+    get class() {
         return InteractionCreate
     }
 }
