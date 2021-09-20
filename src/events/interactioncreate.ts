@@ -22,14 +22,12 @@ class InteractionCreate extends Event {
             .catch(console.error)
 
         function finalize() {
-            try {
-                return command.onInteraction(interaction as CommandInteraction)
-            }
-            catch (err) {
-                if (err instanceof UserError)
-                    (interaction as CommandInteraction)[command.defer ? 'editReply' : 'reply'](err.toMessage())
-                else throw err
-            }
+            command.onInteraction(interaction as CommandInteraction)
+                .catch((err) => {
+                    if (err instanceof UserError)
+                        (interaction as CommandInteraction)[command.defer ? 'editReply' : 'reply'](err.toMessage())
+                    else throw err
+                })
         }
     }
 }

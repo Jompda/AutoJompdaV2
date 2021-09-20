@@ -5,6 +5,7 @@ import { asyncOperation, forEachFile, stringifyPermission } from '../util'
 import * as db from '../database'
 import { Routes } from 'discord-api-types/v9'
 import { parseParametersAndSwitches } from '../interpreter'
+import UserError from '../structure/usererror'
 
 
 const commands = new Map<string, Command>()
@@ -74,55 +75,53 @@ function updateGuildCommands(guildId: string, guildSlashCommands: Array<object>)
 
 
 function runCommandFromMessage(msg: Message) {
-    const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : db.defaultDBGuild.prefix.length)
-    const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
-    const commandName = rawParam.shift()?.toLowerCase()
-    if (!commandName) return msg.reply(`Yup.. That's the prefix..`)
-    const command = (msg.guild ? guildCommands : privateCommands).get(commandName) as Command
-    if (!command) return msg.reply('Unrecognized command **${commandName}**')
-    if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID)
-        return msg.reply('This command is only available to developers.')
+    return new Promise((resolve, reject) => {
+        const content = msg.content.slice(msg.guild ? db.cache.getGuild(msg.guildId as string).prefix.length : db.defaultDBGuild.prefix.length)
+        const rawParam = content.match(/"[^"]+"|[^\s]+/g)?.map(part => part.replace(/"(.+)"/, "$1")) ?? []
+        const commandName = rawParam.shift()?.toLowerCase()
+        if (!commandName) return reject(new UserError(`Yup.. That's the prefix..`))
+        const command = (msg.guild ? guildCommands : privateCommands).get(commandName) as Command
+        if (!command) return reject(new UserError('Unrecognized command **${commandName}**'))
+        if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID)
+            return reject(new UserError('This command is only available to developers.'))
 
-    if (msg.guild) {
-        const check = asyncOperation(2, postPermissionCheck)
+        if (msg.guild) {
+            const check = asyncOperation(2, postPermissionCheck)
 
-        let missingBotPermissions: string[] | null
-        let missingMemberPermissions: string[] | null
-        checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
-            .then(result => {
-                missingBotPermissions = result
-                check()
-            })
-            .catch(console.error) // fatal
-        checkPermissions(msg.member, command.memberPermissions)
-            .then(result => {
-                missingBotPermissions = result
-                check()
-            })
-            .catch(console.error) // fatal
+            let missingBotPermissions: string[] | null
+            let missingMemberPermissions: string[] | null
+            checkPermissions(msg.guild.members.resolve((bot.client.user as User).id), command.botPermissions)
+                .then(result => check(missingBotPermissions = result))
+                .catch(reject)
+            checkPermissions(msg.member, command.memberPermissions)
+                .then(result => check(missingBotPermissions = result))
+                .catch(reject)
 
-        function postPermissionCheck() {
-            if (missingBotPermissions || missingMemberPermissions) {
-                const embed = new MessageEmbed().setTitle('Cannot run this command due to:').setColor('#ff0000')
-                if (missingBotPermissions) {
-                    embed.addField('Bot not having the following permissions:', missingBotPermissions.join('\n'))
+            function postPermissionCheck() {
+                if (missingBotPermissions || missingMemberPermissions) {
+                    const embed = new MessageEmbed().setTitle('Cannot run this command due to:').setColor('#ff0000')
+                    if (missingBotPermissions) {
+                        embed.addField('Bot not having the following permissions:', missingBotPermissions.join('\n'))
+                    }
+                    if (missingMemberPermissions) {
+                        embed.addField('Member not having the following permissions:', missingMemberPermissions.join('\n'))
+                    }
+                    return reject(new UserError(embed))
                 }
-                if (missingMemberPermissions) {
-                    embed.addField('Member not having the following permissions:', missingMemberPermissions.join('\n'))
-                }
-                return msg.reply({ embeds: [embed] })
+                finalize()
             }
-            finalize()
         }
-    }
-    else finalize()
+        else finalize()
 
-    function finalize() {
-        const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
-        if (parsed.parsedParameters.length < command.requiredParameters) return msg.reply('Not enough parameters!')
+        function finalize() {
+            const parsed = parseParametersAndSwitches(command.parameters, command.switches, rawParam)
+            if (parsed.parsedParameters.length < command.requiredParameters) return reject(new UserError('Not enough parameters!'))
 
-        command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
-    }
+            command.onMessage(msg, parsed.parsedParameters, parsed.parsedSwitches)
+                .then(resolve)
+                .catch(reject)
+        }
+    })
 }
 
 

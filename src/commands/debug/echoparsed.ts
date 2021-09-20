@@ -16,9 +16,11 @@ class EchoParsed extends Command {
         })
     }
     onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string>) {
-        const switchObj = {} as any
-        switches.forEach((value, key) => switchObj[key] = value)
-        msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```')
+        return new Promise<any>((resolve, reject) => {
+            const switchObj = {} as any
+            switches.forEach((value, key) => switchObj[key] = value)
+            resolve(msg.reply('```json\n' + JSON.stringify({ parameters, switches: switchObj }, undefined, 2) + '```'))
+        })
     }
 }
 

@@ -24,18 +24,26 @@ class Help extends Command {
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {
-        const parsedParameter = parameters[0] as string
-        const page = parseInt(parsedParameter ?? '1')
-        msg.reply(isNaN(page)
-            ? Help.constructCommandUsage(Boolean(msg.guild), parsedParameter)
-            : Help.constructHelpMenu(Boolean(msg.guild), page))
+        return new Promise<any>((resolve, reject) => {
+            const parsedParameter = parameters[0] as string
+            const page = parseInt(parsedParameter ?? '1')
+            resolve(
+                msg.reply(isNaN(page)
+                    ? Help.constructCommandUsage(Boolean(msg.guild), parsedParameter)
+                    : Help.constructHelpMenu(Boolean(msg.guild), page))
+            )
+        })
     }
     onInteraction(interaction: CommandInteraction) {
-        const option = interaction.options.get('option')?.value as string ?? ''
-        const page = parseInt(option || '1')
-        interaction.editReply(isNaN(page)
-            ? Help.constructCommandUsage(Boolean(interaction.guild), option)
-            : Help.constructHelpMenu(Boolean(interaction.guild), page))
+        return new Promise<any>((resolve, reject) => {
+            const option = interaction.options.get('option')?.value as string ?? ''
+            const page = parseInt(option || '1')
+            resolve(
+                interaction.editReply(isNaN(page)
+                    ? Help.constructCommandUsage(Boolean(interaction.guild), option)
+                    : Help.constructHelpMenu(Boolean(interaction.guild), page))
+            )
+        })
     }
     static constructHelpMenu(isGuild: boolean, page: number) {
         const commandMap = isGuild ? guildCommands : privateCommands

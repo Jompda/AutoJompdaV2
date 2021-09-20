@@ -37,9 +37,9 @@ function stringifyPermission(value: bigint) {
 }
 
 
-function asyncOperation(calls: number, done: Function) {
+function asyncOperation(calls: number, done: (...args: any) => any) {
     let called = 0
-    return () => {
+    return (...args: any) => {
         if (++called === calls) done()
         else if (called > calls) throw new Error('Received too many calls.')
     }

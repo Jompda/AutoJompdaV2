@@ -17,27 +17,25 @@ class SetPrefix extends Command {
             description: 'Sets the command prefix used on the server.',
             contexts: ['guild'],
             memberPermissions: [Permissions.FLAGS.ADMINISTRATOR],
-            slash: true
+            slash: true,
+            defer: true
         })
     }
     onMessage(msg: Message, parameters: Array<string>) {
-        const prefix = parameters[0] as string
-        this.updatePrefix(msg.guildId as string, prefix)
-            .then(() => msg.reply(`Successfully updated the command prefix for the server!`))
-            .catch((err) => {
-                msg.reply(err.message)
-            })
+        return new Promise<any>((resolve, reject) => {
+            const prefix = parameters[0] as string
+            this.updatePrefix(msg.guildId as string, prefix)
+                .then(() => resolve(msg.reply(`Successfully updated the command prefix for the server!`)))
+                .catch(reject)
+        })
     }
     onInteraction(interaction: CommandInteraction) {
         // Could be optimized by deferring and updating the prefix at the same time.
-        interaction.deferReply().then(() => {
+        return new Promise<any>((resolve, reject) => {
             const prefix = interaction.options.get('prefix')?.value as string
             this.updatePrefix(interaction.guildId as string, prefix)
-                .then(() => interaction.editReply(`Successfully updated the command prefix for the server!`))
-                .catch((err) => {
-                    if (err instanceof UserError) return interaction.editReply(err.message)
-                    throw err
-                })
+                .then(() => resolve(interaction.editReply(`Successfully updated the command prefix for the server!`)))
+                .catch(reject)
         })
     }
     private updatePrefix(guildId: string, prefix: string) {

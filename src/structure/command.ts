@@ -105,8 +105,8 @@ abstract class Command {
         }
         return command
     }
-    abstract onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): any
-    onInteraction(interaction: CommandInteraction) { }
+    abstract onMessage(msg: Message, parameters: Array<string>, switches: Map<string, string | null>): Promise<void>
+    onInteraction(interaction: CommandInteraction) { return new Promise<void>(() => { }) }
 }
 
 

@@ -11,13 +11,15 @@ class Ping extends Command {
         })
     }
     onMessage(msg: Message) {
-        msg.reply('Pinging ..')
-            .then(replyMsg => replyMsg.edit(`Ping **${replyMsg.createdTimestamp - msg.createdTimestamp}ms**`))
-            .catch(console.error)
+        return new Promise<any>((resolve, reject) => {
+            msg.reply('Pinging ..')
+                .then(replyMsg => resolve(replyMsg.edit(`Ping **${replyMsg.createdTimestamp - msg.createdTimestamp}ms**`)))
+                .catch(reject)
+        })
     }
-    onInteraction(interaction: CommandInteraction) {
+    /*onInteraction(interaction: CommandInteraction) {
         interaction.reply(`Slash command not implemented yet!`)
-    }
+    }*/
 }
 
 
