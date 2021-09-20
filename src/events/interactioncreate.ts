@@ -8,13 +8,12 @@ import { EventEmitter } from 'stream'
 
 
 class InteractionCreate extends Event {
-    static eventEmitter: EventEmitter
+    static eventEmitter = new EventEmitter()
     constructor() {
         super({ eventName: 'interactionCreate' })
-        InteractionCreate.eventEmitter = new EventEmitter()
     }
     run(interaction: Interaction) {
-        if (!interaction.isCommand()) return InteractionCreate.nonCommandInteraction(interaction as MessageComponentInteraction)
+        if (!interaction.isCommand()) return this.nonCommandInteraction(interaction as MessageComponentInteraction)
         if (interaction.user.id === (bot.client.user as User).id) return
         const command = (interaction.guild ? guildCommands : privateCommands).get(interaction.commandName) as Command
         if (!command) return interaction.reply(`Unknown slash command! (idk how)`)
@@ -33,11 +32,11 @@ class InteractionCreate extends Event {
                 })
         }
     }
-    static nonCommandInteraction(interaction: MessageComponentInteraction) {
-        InteractionCreate.eventEmitter.emit(interaction.customId, interaction)
-    }
     get class() {
         return InteractionCreate
+    }
+    nonCommandInteraction(interaction: MessageComponentInteraction) {
+        InteractionCreate.eventEmitter.emit(interaction.customId, interaction)
     }
 }
 

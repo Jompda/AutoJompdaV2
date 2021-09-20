@@ -16,7 +16,7 @@ function initializeEvents() {
                         throw new Error(`Non-Event script file "${filepath}" under events folder!`)
 
                     const event = jsfile.default as Event
-                    (event.runOnce ? bot.client.once : bot.client.on).apply(bot.client, [event.eventName, event.run])
+                    (event.runOnce ? bot.client.once : bot.client.on).apply(bot.client, [event.eventName, (...args: any) => event.run(...args)])
 
                 } catch (err) {
                     errors.push(err as Error)
