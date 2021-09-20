@@ -35,7 +35,7 @@ function initializeCommands() {
                 }
             }
         )
-        if (errors.length) return reject(errors)
+        if (errors.length) return reject(new Error(errors.join('\n')))
 
         if (bot.launchOptions.parsedSwitches.has('-update-slash-commands')) {
             console.log('Updating slash commands ..')
