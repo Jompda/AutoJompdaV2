@@ -19,11 +19,12 @@ Option | Expected value | Description
 ## TODO
 - [x] Add support for slash commands
 - [x] Events use promises
-- [ ] Add support for defining role assigment buttons
+- [ ] Add support for categorized role embeds.
 - [ ] Persistent logging
 - [ ] Support for a dedicated database
 - [ ] Somewhat error resistant so the bot doesn't go offline on uncaughtException
 
 ### Add commands
 - [ ] **Helari** - Helarifies the previous message.
+- [ ] **TOC** - Table of Contents - Embed which contains links to messages.
 
