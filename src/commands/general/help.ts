@@ -55,7 +55,9 @@ class Help extends Command {
             pageCommands.push(command[1])
         pageCommands = pageCommands.slice(startIndex, startIndex + commandsPerPage)
 
-        const embed = new MessageEmbed().setTitle(`Help - page ${page} of ${pages}`)
+        const embed = new MessageEmbed()
+            .setTitle(`Help - page ${page} of ${pages}`)
+            .setTimestamp()
         embed.setDescription('**Bot commands:**\n' +
             pageCommands.map(command =>
                 (command.slash ? '/' : '') +
@@ -64,20 +66,21 @@ class Help extends Command {
             ).join('\n')
         )
         if (bot.developerUser) embed.addField('Developer', bot.developerUser.tag)
-        embed.setTimestamp()
 
         return { embeds: [embed] }
     }
     static constructCommandUsage(isGuild: boolean, commandName: string) {
         const command = (isGuild ? guildCommands : privateCommands).get(commandName)
         if (!command) return `Unrecognized command name **${commandName}**.`
-        return {
-            embeds: [new MessageEmbed()
-                .setTitle(commandName)
-                .addField('Description', command.description + (command.usageDescription ? '\n' + command.usageDescription : ''))
-                .addField('Usage', db.defaultDBGuild.prefix + command.usage)
-            ]
-        }
+        const embed = new MessageEmbed()
+            .setTitle(commandName)
+            .addField('Description', command.description + (command.usageDescription ? '\n' + command.usageDescription : ''))
+            .addField('Usage', db.defaultDBGuild.prefix + command.usage)
+            .setTimestamp()
+
+        if (bot.developerUser) embed.addField('Developer', bot.developerUser.tag)
+
+        return { embeds: [embed] }
     }
 }
 

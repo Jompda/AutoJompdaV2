@@ -9,7 +9,7 @@ class Steal extends Command {
             commandName: 'steal',
             parameters: [
                 {
-                    parameterName: 'emojiname',
+                    parameterName: 'emoji_name',
                     description: 'The name for the emoji',
                     valueType: 'string',
                     required: true

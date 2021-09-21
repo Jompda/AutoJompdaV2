@@ -36,7 +36,6 @@ interface CommandOptions {
     commandName: string,
     parameters?: Array<CommandParameter>
     switches?: Array<CommandSwitch>
-    usage?: string,
     usageDescription?: string,
     description: string,
     contexts: Array<Context>
@@ -77,6 +76,7 @@ abstract class Command {
                 }
         this.switches = options.switches
         this.usage = constructUsage(options)
+        this.usageDescription = options.usageDescription
         this.description = options.description
         this.contexts = options.contexts
         this.memberPermissions = options.memberPermissions ?? []

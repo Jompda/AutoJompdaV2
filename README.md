@@ -19,12 +19,14 @@ Option | Expected value | Description
 ## TODO
 - [x] Add support for slash commands
 - [x] Events use promises
-- [ ] Add support for categorized role embeds.
+- [ ] Add support for reaction roles.
 - [ ] Persistent logging
 - [ ] Support for a dedicated database
 - [ ] Somewhat error resistant so the bot doesn't go offline on uncaughtException
 
 ### Add commands
 - [ ] **Helari** - Helarifies the previous message.
-- [ ] **TOC** - Table of Contents - Embed which contains links to messages.
+- [ ] **CreateEmbed** - Creates Embeds based off of a json file.
+- [ ] **UpdateEmebd** - Updates the created embed.
+- [ ] **CreateReactionRole** - Adds a reaction to a specified message and listens for reactions.
 
