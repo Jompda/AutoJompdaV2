@@ -1,13 +1,13 @@
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, ReplyMessageOptions } from "discord.js";
 
 export default class UserError extends Error {
-    embed: MessageEmbed | null
+    embed?: MessageEmbed
     constructor(msg: string | MessageEmbed) {
-        let isEmbed = typeof msg === 'string'
-        super(isEmbed ? msg as string : '')
-        this.embed = isEmbed ? null : msg as MessageEmbed
+        super()
+        if (typeof msg === 'string') this.message = msg
+        else this.embed = msg
     }
-    toMessage() {
-        return this.embed ? { embeds: [this.embed as MessageEmbed] } : this.message
+    toMessage(): string | ReplyMessageOptions {
+        return this.embed ? { embeds: [this.embed] } : this.message
     }
 }
