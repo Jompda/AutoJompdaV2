@@ -26,7 +26,7 @@ Option | Expected value | Description
 
 ### Add commands
 - [ ] **Helari** - Helarifies the previous message.
-- [ ] **CreateEmbed** - Creates Embeds based off of a json file.
-- [ ] **UpdateEmebd** - Updates the created embed.
+- [x] **CreateEmbed** - Creates a Embed from a JSON file.
+- [ ] **UpdateEmbed** - Updates the created embed.
 - [ ] **CreateReactionRole** - Adds a reaction to a specified message and listens for reactions.
 
