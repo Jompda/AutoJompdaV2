@@ -19,7 +19,8 @@ Option | Expected value | Description
 ## TODO
 - [x] Add support for slash commands
 - [x] Events use promises
-- [ ] Add support for reaction roles.
+- [ ] Modules with commands which can interact with the database and other managers
+  - [ ] Add support for reaction roles.
 - [ ] Persistent logging
 - [ ] Support for a dedicated database
 - [ ] Somewhat error resistant so the bot doesn't go offline on uncaughtException
