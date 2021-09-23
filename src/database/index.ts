@@ -7,12 +7,39 @@ import defaultDBGuild from './defaultdbguild.json'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
+interface ReactionRole {
+    channelId: string
+    messageId: string
+    reaction: string
+    roleId: string
+}
+
+
 class DBGuild {
     guildId: string
     prefix: string
+    reactionRoles: Array<ReactionRole>
     constructor(dbGuildResolvable: any) {
         this.guildId = dbGuildResolvable.guildId
         this.prefix = dbGuildResolvable.prefix
+        this.reactionRoles = []
+    }
+    addReactionRole(reactionRole: ReactionRole) {
+        return new Promise<void>((resolve, reject) => {
+            db.run(`INSERT INTO reactionRole VALUES (?, ?, ?, ?, ?)`,
+                [
+                    this.guildId,
+                    reactionRole.channelId,
+                    reactionRole.messageId,
+                    reactionRole.reaction,
+                    reactionRole.roleId
+                ],
+                err => {
+                    console.log('added', reactionRole)
+                    if (err) return reject(err)
+                    resolve()
+                })
+        })
     }
     update() {
         return new Promise<void>((resolve, reject) => {
@@ -42,6 +69,7 @@ function serialize() {
         db.serialize(() => {
             console.log('Serializing the database ..')
             db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT)')
+            db.run('CREATE TABLE IF NOT EXISTS reactionRole (guildId TEXT, channelId TEXT, messageId TEXT, reaction TEXT, roleId TEXT)')
             synchronizeGuilds()
                 .then(resolve)
                 .catch(reject)

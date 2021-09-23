@@ -19,7 +19,7 @@ type Context = 'guild' | 'private'
 interface CommandParameter {
     // TODO: Add support for choices.
     parameterName: string
-    valueType: string
+    valueType: 'boolean' | 'channel' | 'integer' | 'mentionable' | 'number' | 'role' | 'string' | 'user'
     description: string
     required?: boolean
 }

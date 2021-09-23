@@ -81,7 +81,7 @@ function runCommandFromMessage(msg: Message) {
         const commandName = rawParam.shift()?.toLowerCase()
         if (!commandName) return reject(new UserError(`Yup.. That's the prefix..`))
         const command = (msg.guild ? guildCommands : privateCommands).get(commandName) as Command
-        if (!command) return reject(new UserError('Unrecognized command **${commandName}**'))
+        if (!command) return reject(new UserError(`Unrecognized command **${commandName}**`))
         if (command.debug && msg.author.id !== process.env.DEVELOPER_DISCORD_CLIENT_ID)
             return reject(new UserError('This command is only available to developers.'))
 

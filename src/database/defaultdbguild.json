@@ -1,3 +1,5 @@
 {
-    "prefix": "aj."
+    "guildId": null,
+    "prefix": "aj.",
+    "reactionRoles": []
 }
