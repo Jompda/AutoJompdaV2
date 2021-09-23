@@ -18,13 +18,13 @@ interface ReactionRole {
 class DBGuild {
     guildId: string
     prefix: string
-    reactionRoles: Array<ReactionRole>
+    //reactionRoles: Array<ReactionRole>
     constructor(dbGuildResolvable: any) {
         this.guildId = dbGuildResolvable.guildId
         this.prefix = dbGuildResolvable.prefix
-        this.reactionRoles = []
+        //this.reactionRoles = []
     }
-    addReactionRole(reactionRole: ReactionRole) {
+    /*addReactionRole(reactionRole: ReactionRole) { // Moving this to a module
         return new Promise<void>((resolve, reject) => {
             db.run(`INSERT INTO reactionRole VALUES (?, ?, ?, ?, ?)`,
                 [
@@ -40,7 +40,7 @@ class DBGuild {
                     resolve()
                 })
         })
-    }
+    }*/
     update() {
         return new Promise<void>((resolve, reject) => {
             db.run(`UPDATE guild SET prefix = ? WHERE guildId = '${this.guildId}'`,
@@ -68,8 +68,8 @@ function serialize() {
     return new Promise<void>((resolve, reject) => {
         db.serialize(() => {
             console.log('Serializing the database ..')
-            db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT)')
-            db.run('CREATE TABLE IF NOT EXISTS reactionRole (guildId TEXT, channelId TEXT, messageId TEXT, reaction TEXT, roleId TEXT)')
+            db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT, botModulesData TEXT)')
+            //db.run('CREATE TABLE IF NOT EXISTS reactionRole (guildId TEXT, channelId TEXT, messageId TEXT, reaction TEXT, roleId TEXT)')
             synchronizeGuilds()
                 .then(resolve)
                 .catch(reject)

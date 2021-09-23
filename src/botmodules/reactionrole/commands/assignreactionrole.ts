@@ -70,14 +70,14 @@ class AssignReactionRole extends Command {
                     .catch(reject)
 
                 const dbGuild = db.cache.getGuild(interaction.guildId as string)
-                dbGuild.addReactionRole({
+                /*dbGuild.addReactionRole({
                     channelId: interaction.channelId,
                     messageId: message.id,
                     reaction: reaction,
                     roleId: role.id
                 })
-                    .then(resolve)
-                    .catch(() => reject(new UserError('Something went wrong while assigning the reaction role to the database!')))
+                .then(resolve)
+                .catch(() => reject(new UserError('Something went wrong while assigning the reaction role to the database!')))*/
             }
         })
     }
