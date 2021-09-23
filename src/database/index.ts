@@ -7,21 +7,24 @@ import defaultDBGuild from './defaultdbguild.json'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
-interface ReactionRole {
+/*interface ReactionRole {
     channelId: string
     messageId: string
     reaction: string
     roleId: string
-}
+}*/
 
 
 class DBGuild {
     guildId: string
     prefix: string
+    botModulesData: Array<any> // Map would be better?
     //reactionRoles: Array<ReactionRole>
     constructor(dbGuildResolvable: any) {
         this.guildId = dbGuildResolvable.guildId
         this.prefix = dbGuildResolvable.prefix
+        this.botModulesData = JSON.parse(dbGuildResolvable.botModulesData)
+        console.log(this)
         //this.reactionRoles = []
     }
     /*addReactionRole(reactionRole: ReactionRole) { // Moving this to a module
@@ -43,8 +46,11 @@ class DBGuild {
     }*/
     update() {
         return new Promise<void>((resolve, reject) => {
-            db.run(`UPDATE guild SET prefix = ? WHERE guildId = '${this.guildId}'`,
-                [this.prefix],
+            db.run(`UPDATE guild SET prefix = ?, botModulesData = ? WHERE guildId = '${this.guildId}'`,
+                [
+                    this.prefix,
+                    JSON.stringify(this.botModulesData)
+                ],
                 err => {
                     if (err) return reject(err)
                     resolve()
@@ -91,7 +97,7 @@ function close() {
 function synchronizeGuilds() {
     return new Promise<void>((resolve, reject) => {
         console.log('Synchronizing guilds with the database ..')
-        db.all('SELECT guildId, prefix FROM guild', (err, rows) => {
+        db.all('SELECT guildId, prefix, botModulesData FROM guild', (err, rows) => {
             if (err) return reject(err)
             bot.client.guilds.fetch()
                 .then(guilds => {
@@ -107,9 +113,10 @@ function synchronizeGuilds() {
                         }
                         else {
                             cache.guilds.set(guildId, new DBGuild({ ...{ guildId }, ...defaultDBGuild }))
-                            db.run('INSERT INTO guild VALUES (?, ?)', [
+                            db.run('INSERT INTO guild VALUES (?, ?, ?)', [
                                 guildId,
-                                defaultDBGuild.prefix
+                                defaultDBGuild.prefix,
+                                JSON.stringify(defaultDBGuild.botModulesData)
                             ], (err) => {
                                 if (err) return reject(err) // TODO: Work around reject getting called multiple times.
                                 console.log(`Added guild ${guild.name}(${guildId}) to the database.`)
