@@ -38,7 +38,7 @@ if (bot.launchOptions.parsedSwitches.has('debug')) {
 export default bot
 import { initializeCommands } from './commands'
 import { initializeEvents } from './events'
-import * as db from './database'
+import db from './database'
 import { asyncOperation } from './util'
 
 

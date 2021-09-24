@@ -2,10 +2,11 @@ import { GuildMember, Message, MessageEmbed, User } from 'discord.js'
 import bot from '..'
 import { Command } from '../structure/command'
 import { asyncOperation, forEachFile, stringifyPermission } from '../util'
-import * as db from '../database'
+import db from '../database'
 import { Routes } from 'discord-api-types/v9'
 import { parseParametersAndSwitches } from '../interpreter'
 import UserError from '../structure/usererror'
+import { botModules } from '../botmodules'
 
 
 const commands = new Map<string, Command>()
@@ -24,17 +25,17 @@ function initializeCommands() {
                     const jsfile = require(filepath)
                     if (!('default' in jsfile) || !(jsfile.default instanceof Command))
                         throw new Error(`Non-Command script file "${filepath}" under commands folder!`)
-
-                    const command = jsfile.default as Command
-                    if (command.debug && !bot.debugMode) return
-                    commands.set(command.commandName, command)
-                    if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
-                    if (command.hasContext('private')) privateCommands.set(command.commandName, command)
+                    addCommand(jsfile.default as Command)
                 } catch (err) {
                     errors.push(err as Error)
                 }
             }
         )
+        for (const botModule of botModules)
+            for (const command of botModule.commands ?? [])
+                try { addCommand(command) }
+                catch (err) { errors.push(err as Error) }
+
         if (errors.length) return reject(new Error(errors.join('\n')))
 
         if (bot.launchOptions.parsedSwitches.has('-update-slash-commands')) {
@@ -63,6 +64,14 @@ function initializeCommands() {
         }
         else resolve()
     })
+}
+
+
+function addCommand(command: Command) {
+    if (command.debug && !bot.debugMode) return
+    commands.set(command.commandName, command)
+    if (command.hasContext('guild')) guildCommands.set(command.commandName, command)
+    if (command.hasContext('private')) privateCommands.set(command.commandName, command)
 }
 
 
@@ -146,6 +155,7 @@ export {
     guildCommands,
     privateCommands,
     initializeCommands,
+    addCommand,
     updateGuildCommands,
     runCommandFromMessage
 }

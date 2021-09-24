@@ -1,5 +1,6 @@
 import * as sqlite from 'sqlite3'
 import bot from '..'
+import { botModules } from '../botmodules'
 import { asyncOperation } from '../util'
 import defaultDBGuild from './defaultdbguild.json'
 
@@ -7,43 +8,18 @@ import defaultDBGuild from './defaultdbguild.json'
 const db = new (sqlite.verbose()).Database('database.sqlite3')
 
 
-/*interface ReactionRole {
-    channelId: string
-    messageId: string
-    reaction: string
-    roleId: string
-}*/
-
-
 class DBGuild {
     guildId: string
     prefix: string
     botModulesData: Array<any> // Map would be better?
-    //reactionRoles: Array<ReactionRole>
     constructor(dbGuildResolvable: any) {
         this.guildId = dbGuildResolvable.guildId
         this.prefix = dbGuildResolvable.prefix
-        this.botModulesData = JSON.parse(dbGuildResolvable.botModulesData)
+        this.botModulesData = typeof dbGuildResolvable.botModulesData === 'string'
+            ? JSON.parse(dbGuildResolvable.botModulesData)
+            : dbGuildResolvable.botModulesData
         console.log(this)
-        //this.reactionRoles = []
     }
-    /*addReactionRole(reactionRole: ReactionRole) { // Moving this to a module
-        return new Promise<void>((resolve, reject) => {
-            db.run(`INSERT INTO reactionRole VALUES (?, ?, ?, ?, ?)`,
-                [
-                    this.guildId,
-                    reactionRole.channelId,
-                    reactionRole.messageId,
-                    reactionRole.reaction,
-                    reactionRole.roleId
-                ],
-                err => {
-                    console.log('added', reactionRole)
-                    if (err) return reject(err)
-                    resolve()
-                })
-        })
-    }*/
     update() {
         return new Promise<void>((resolve, reject) => {
             db.run(`UPDATE guild SET prefix = ?, botModulesData = ? WHERE guildId = '${this.guildId}'`,
@@ -75,7 +51,9 @@ function serialize() {
         db.serialize(() => {
             console.log('Serializing the database ..')
             db.run('CREATE TABLE IF NOT EXISTS guild (guildId TEXT, prefix TEXT, botModulesData TEXT)')
-            //db.run('CREATE TABLE IF NOT EXISTS reactionRole (guildId TEXT, channelId TEXT, messageId TEXT, reaction TEXT, roleId TEXT)')
+            for (const botModule of botModules)
+                if (botModule.databaseInitializer)
+                    db.run(botModule.databaseInitializer)
             synchronizeGuilds()
                 .then(resolve)
                 .catch(reject)
@@ -131,11 +109,22 @@ function synchronizeGuilds() {
 }
 
 
-export {
+function query(query: string, params: any) {
+    return new Promise<Array<object>>((resolve, reject) => {
+        db.all(query, params, (err, rows) => {
+            if (err) return reject(err)
+            resolve(rows)
+        })
+    })
+}
+
+
+export default {
     defaultDBGuild,
     DBGuild,
     serialize,
     close,
-    cache
+    cache,
+    query
 }
 

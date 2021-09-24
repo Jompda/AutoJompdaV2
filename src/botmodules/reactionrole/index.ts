@@ -8,7 +8,8 @@ class ReactionRoles extends BotModule {
             name: 'reaction_roles',
             commands: [
                 AssignReactionRole
-            ]
+            ],
+            databaseInitializer: `CREATE TABLE IF NOT EXISTS reactionRole (guildId TEXT, channelId TEXT, messageId TEXT, reaction TEXT, roleId TEXT)`
         })
     }
 }

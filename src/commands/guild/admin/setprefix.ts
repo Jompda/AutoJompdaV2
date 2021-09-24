@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from 'discord.js'
 import { Command } from '../../../structure/command'
-import * as db from '../../../database'
+import db from '../../../database'
 import UserError from '../../../structure/usererror'
 
 

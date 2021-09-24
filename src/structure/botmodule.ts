@@ -1,10 +1,12 @@
-import { Command } from "./command";
+import { Command } from './command'
+
 
 interface BotModuleOptions {
     name: string
     commands?: Array<Command>
     databaseInitializer?: string
 }
+
 
 export default abstract class BotModule {
     name: string
