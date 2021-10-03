@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { addCommand } from '../commands'
 import BotModule from '../structure/botmodule'
 
 
@@ -12,9 +11,9 @@ for (const moduleFile of fs.readdirSync(__dirname)) {
     if (!fs.statSync(tempModulePath).isDirectory()) continue
 
     const moduleIndex = require(path.resolve(tempModulePath, 'index.js'))
-    if (!('default' in moduleIndex) || !(moduleIndex.default instanceof BotModule))
+    if (!(moduleIndex.botModule instanceof BotModule))
         throw new Error(`Non-BotModule index file under "${tempModulePath}"!`)
-    const botModule = moduleIndex.default as BotModule
+    const botModule = moduleIndex.botModule as BotModule
     botModules.push(botModule)
 }
 

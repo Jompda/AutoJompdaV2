@@ -1,39 +1,12 @@
 import * as sqlite from 'sqlite3'
 import bot from '..'
 import { botModules } from '../botmodules'
+import DBGuild from '../structure/dbguild'
 import { asyncOperation } from '../util'
 import defaultDBGuild from './defaultdbguild.json'
 
 
 const db = new (sqlite.verbose()).Database('database.sqlite3')
-
-
-class DBGuild {
-    guildId: string
-    prefix: string
-    botModulesData: Array<any> // Map would be better?
-    constructor(dbGuildResolvable: any) {
-        this.guildId = dbGuildResolvable.guildId
-        this.prefix = dbGuildResolvable.prefix
-        this.botModulesData = typeof dbGuildResolvable.botModulesData === 'string'
-            ? JSON.parse(dbGuildResolvable.botModulesData)
-            : dbGuildResolvable.botModulesData
-        console.log(this)
-    }
-    update() {
-        return new Promise<void>((resolve, reject) => {
-            db.run(`UPDATE guild SET prefix = ?, botModulesData = ? WHERE guildId = '${this.guildId}'`,
-                [
-                    this.prefix,
-                    JSON.stringify(this.botModulesData)
-                ],
-                err => {
-                    if (err) return reject(err)
-                    resolve()
-                })
-        })
-    }
-}
 
 
 const cache = {
@@ -109,7 +82,7 @@ function synchronizeGuilds() {
 }
 
 
-function query(query: string, params: any) {
+function query(query: string, params?: any) {
     return new Promise<Array<object>>((resolve, reject) => {
         db.all(query, params, (err, rows) => {
             if (err) return reject(err)

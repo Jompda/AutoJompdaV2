@@ -2,7 +2,6 @@ import { Command } from './command'
 
 
 interface BotModuleOptions {
-    name: string
     commands?: Array<Command>
     databaseInitializer?: string
 }
@@ -13,8 +12,9 @@ export default abstract class BotModule {
     commands?: Array<Command>
     databaseInitializer?: string
     constructor(options: BotModuleOptions) {
-        this.name = options.name
+        this.name = this.constructor.name
         this.commands = options.commands
         this.databaseInitializer = options.databaseInitializer
     }
+    initialize() { }
 }

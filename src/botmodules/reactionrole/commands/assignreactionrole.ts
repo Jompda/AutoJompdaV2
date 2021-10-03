@@ -1,16 +1,8 @@
 import { CommandInteraction, Message, Permissions, TextBasedChannels } from 'discord.js'
 import { Command } from '../../../structure/command'
-import db from '../../../database'
 import UserError from '../../../structure/usererror'
 import { asyncOperation } from '../../../util'
-
-
-/*interface ReactionRole {
-    channelId: string
-    messageId: string
-    reaction: string
-    roleId: string
-}*/
+import { ReactionRole } from '..'
 
 
 class AssignReactionRole extends Command {
@@ -49,9 +41,11 @@ class AssignReactionRole extends Command {
             defer: true
         })
     }
-    onMessage(msg: Message, parameters: Array<string>) {
+    onMessage(msg: Message) {
         return new Promise<any>((resolve, reject) => {
-            resolve(msg.reply('Use the slash command please.'))
+            msg.reply('Use the slash command please.')
+                .then(resolve)
+                .catch(reject)
         })
     }
     onInteraction(interaction: CommandInteraction) {
@@ -77,35 +71,20 @@ class AssignReactionRole extends Command {
                     })
                     .catch(reject)
 
-                const dbGuild = db.cache.getGuild(interaction.guildId as string)
-                /*dbGuild.addReactionRole({
+                const reactionRole = new ReactionRole({
+                    guildId: interaction.guildId as string,
                     channelId: interaction.channelId,
                     messageId: message.id,
-                    reaction: reaction,
+                    reaction,
                     roleId: role.id
                 })
-                .then(resolve)
-                .catch(() => reject(new UserError('Something went wrong while assigning the reaction role to the database!')))*/
+
+                reactionRole.create()
+                    .then(resolve)
+                    .catch(() => reject(new UserError('Something went wrong while assigning the reaction role to the database!')))
             }
         })
     }
-    /*addReactionRole(reactionRole: ReactionRole) { // Moving this to a module
-        return new Promise<void>((resolve, reject) => {
-            db.run(`INSERT INTO reactionRole VALUES (?, ?, ?, ?, ?)`,
-                [
-                    this.guildId,
-                    reactionRole.channelId,
-                    reactionRole.messageId,
-                    reactionRole.reaction,
-                    reactionRole.roleId
-                ],
-                err => {
-                    console.log('added', reactionRole)
-                    if (err) return reject(err)
-                    resolve()
-                })
-        })
-    }*/
 }
 
 
