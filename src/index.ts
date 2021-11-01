@@ -52,7 +52,7 @@ bot.client.once('ready', () => {
             .then(developerUser => bot.developerUser = developerUser)
             .catch(console.error)
 
-    const check = asyncOperation(2, () => console.log('Bot is ready to serve!'))
+    const check = asyncOperation(2, () => console.log(`Bot is ready! Listening on ${db.cache.guilds.size} servers ..`))
     bot.client.guilds.fetch()
         .then(() => {
             initializeCommands()

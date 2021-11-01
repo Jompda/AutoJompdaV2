@@ -11,7 +11,6 @@ export default class DBGuild {
         this.botModulesData = typeof dbGuildResolvable.botModulesData === 'string'
             ? JSON.parse(dbGuildResolvable.botModulesData)
             : dbGuildResolvable.botModulesData
-        console.log(this)
     }
     update() {
         return new Promise<any>((resolve, reject) => {
